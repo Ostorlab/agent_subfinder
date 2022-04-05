@@ -23,10 +23,5 @@ RUN mkdir -p .config/subfinder/
 WORKDIR /root/.config/subfinder/
 RUN touch provider-config.yaml
 
-RUN mkdir -p /app/ostorlab
-COPY ostorlab_client /app/ostorlab
-WORKDIR /app/ostorlab
-RUN python3 -m pip install .
-
 WORKDIR /app
 CMD ["python3", "/app/agent/subfinder_agent.py"]
