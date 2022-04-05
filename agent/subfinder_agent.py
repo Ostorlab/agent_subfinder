@@ -8,7 +8,7 @@ from ostorlab.agent.mixins import agent_persist_mixin
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 
-import subfinder
+from agent import subfinder
 
 
 logging.basicConfig(
