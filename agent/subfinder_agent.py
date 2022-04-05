@@ -32,10 +32,10 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
     def process(self, message: m.Message) -> None:
         """Process messages of type  v3.asset.domain_name
-        Runs Subfinder on the domain_name and emits back the findings.
+        Runs Subfinder on the domain name and emits back the findings.
 
         Args:
-            message: The received message
+            message: The received message.
         """
         logger.info('processing message of selector : %s', message.selector)
         domain_name = message.data['name']
@@ -49,7 +49,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                 for sub in sub_domains:
                     self.set_add('processed_domains', sub)
                     self.emit(selector='v3.asset.domain_name', data={'name': sub})
-                    
+
         else:
             logger.info('%s has already been processed. skipping for now.', domain_name)
 
