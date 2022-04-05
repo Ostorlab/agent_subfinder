@@ -19,6 +19,6 @@ def  fixture_subfinder_agent():
         bus_management_url='http://guest:guest@localhost:15672/',
         bus_vhost='/',
         redis_url='redis://guest:guest@localhost:6379'
-    )        
+    )
     agent = subfinder_agent.SubfinderAgent(agent_definition=definitions, agent_settings= settings)
     return agent
