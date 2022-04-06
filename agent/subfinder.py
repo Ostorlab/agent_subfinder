@@ -1,6 +1,5 @@
 """Wrapper module around the Subfinder subdomaine discovery tool."""
 import io
-import tempfile
 import subprocess
 import logging
 from typing import List
