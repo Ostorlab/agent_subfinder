@@ -7,9 +7,9 @@ def testAgentSubfinder_whenFindsSubDomains_emitsBackFindings(subfinder_agent, ag
     """Unittest for emitting back the found subdomains of the agent Subfinder."""
     del agent_persist_mock
     subfinder_output = [
-        'subdomain1',
-        'subdomain2',
-        'subdomain3'
+        'subdomain1.co',
+        'subdomain2.co',
+        'subdomain3.co'
     ]
 
     mocker.patch('agent.subfinder.SubFinder.discover', return_value=subfinder_output)
@@ -25,12 +25,13 @@ def testAgentSubfinder_whenDomainHasAlreadyBeenProcessed_theDomainIsSkipped(subf
                                                                             agent_persist_mock,
                                                                             agent_mock,
                                                                             mocker):
-    """Unittest for Agent Subfinder. Case where a domain has already been processed, should be skipped."""
+    """Unittest for Agent Subfinder. When it receives a domain that has already been processed,
+    the agent should skip it."""
     del agent_persist_mock
     subfinder_output = [
-        'subdomain1',
-        'subdomain2',
-        'subdomain3'
+        'subdomain1.co',
+        'subdomain2.co',
+        'subdomain3.co'
     ]
     mocker.patch('agent.subfinder.SubFinder.discover', return_value=subfinder_output)
     msg = message.Message.from_data(selector='v3.asset.domain_name', data={'name': 'somedomain.com'})
