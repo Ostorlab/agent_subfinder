@@ -2,6 +2,7 @@
 import logging
 
 from rich import logging as rich_logging
+import tld
 from ostorlab.agent import agent
 from ostorlab.agent import message as m
 from ostorlab.agent.mixins import agent_persist_mixin
@@ -29,6 +30,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
         agent.Agent.__init__(self, agent_definition, agent_settings)
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
+        self._storage_name = f'processed_domains_{agent_definition.name}'
 
     def process(self, message: m.Message) -> None:
         """Process messages of type  v3.asset.domain_name
@@ -39,15 +41,14 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         """
         logger.info('processing message of selector : %s', message.selector)
         domain_name = message.data['name']
+        canonalized_domain = tld.get_tld(domain_name, as_object=True, fix_protocol=True)
+        canonalized_domain = canonalized_domain.domain
 
-        if self.set_is_member('processed_domains', domain_name) is False:
-            self.set_add('processed_domains', domain_name)
-
-            with subfinder.SubFinder().subfinder_handler() as subfinder_handler:
+        if self.set_add(self._storage_name, canonalized_domain) is True:
+            with subfinder.SubFinder() as subfinder_handler:
                 sub_domains = subfinder_handler.discover(domain_name)
 
                 for sub in sub_domains:
-                    self.set_add('processed_domains', sub)
                     self.emit(selector='v3.asset.domain_name', data={'name': sub})
 
         else:
