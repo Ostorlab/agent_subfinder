@@ -15,7 +15,7 @@ _Subfinder agent is a subdomain discovery tool that discovers valid subdomains f
 This repository is an implementation of [Ostorlab Agent](https://pypi.org/project/ostorlab/) for [Subfinder](https://github.com/projectdiscovery/subfinder) discovery tool by by ProjectDiscovery.
 
 ## Getting Started
-The Subfinder Agent works collectively with other agents. It's job; from a domain name, discover all subdomains in a fast and efficient way, 
+The Subfinder Agent works collectively with other agents. Its job; from a domain name, discover all subdomains in a fast and efficient way, 
 and pass its findings to other agents responsible for scanning the subdomains, for example, the [Nuclei agent](https://github.com/Ostorlab/agent_nuclei)
 
 
