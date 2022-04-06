@@ -20,6 +20,7 @@ logging.basicConfig(
     force=True
 )
 logger = logging.getLogger(__name__)
+STORAGE_NAME = 'agent_subfinder_storage'
 
 
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
@@ -30,7 +31,6 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
         agent.Agent.__init__(self, agent_definition, agent_settings)
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
-        self._storage_name = f'processed_domains_{agent_definition.name}'
 
     def process(self, message: m.Message) -> None:
         """Process messages of type  v3.asset.domain_name
@@ -44,7 +44,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         canonalized_domain = tld.get_tld(domain_name, as_object=True, fix_protocol=True)
         canonalized_domain = canonalized_domain.domain
 
-        if self.set_add(self._storage_name, canonalized_domain) is True:
+        if self.set_add(STORAGE_NAME, canonalized_domain) is True:
             with subfinder.SubFinder() as subfinder_handler:
                 sub_domains = subfinder_handler.discover(domain_name)
 

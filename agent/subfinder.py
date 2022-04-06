@@ -1,5 +1,6 @@
 """Wrapper module around the Subfinder subdomaine discovery tool."""
 import io
+import tempfile
 import subprocess
 import logging
 from typing import List
@@ -13,7 +14,7 @@ class SubFinder:
     _output_file = None
 
     def __enter__(self):
-        self._output_file = open('/tmp/subfinder_output.txt', 'w+', encoding='utf-8')
+        self._output_file = tempfile.NamedTemporaryFile(suffix='.txt', prefix='subfinder', dir='/tmp')
         return self
 
     def _subdomain_discovery(self, domain: str, output_file: io.TextIOWrapper) -> None:
@@ -44,4 +45,3 @@ class SubFinder:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._output_file.close()
-        return self
