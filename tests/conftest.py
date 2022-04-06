@@ -20,5 +20,5 @@ def  fixture_subfinder_agent():
             healthcheck_port=5301,
             redis_url='redis://guest:guest@localhost:6379')
 
-        agent = subfinder_agent.SubfinderAgent(definition, settings) 
+        agent = subfinder_agent.SubfinderAgent(definition, settings)
         return agent
