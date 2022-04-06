@@ -16,7 +16,7 @@ This repository is an implementation of [Ostorlab Agent](https://pypi.org/projec
 
 ## Getting Started
 The Subfinder Agent works collectively with other agents. It's job; from a domain name, discover all subdomains in a fast and efficient way, 
-and pass its findings to other agents reponsible for scanning the subdomains, for example the [Nuclei agent](https://github.com/Ostorlab/agent_nuclei)
+and pass its findings to other agents responsible for scanning the subdomains, for example, the [Nuclei agent](https://github.com/Ostorlab/agent_nuclei)
 
 
 To perform your first scan, simply run the following command:
