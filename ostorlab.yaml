@@ -1,6 +1,7 @@
 kind: Agent
 name: subfinder
 version: 0.0.1
+image: images/logo.png 
 description: |
   This repository is an implementation of [Ostorlab Agent](https://pypi.org/project/ostorlab/) for [Subfinder](https://github.com/projectdiscovery/subfinder) discovery tool by by ProjectDiscovery.
   ## Getting Started
