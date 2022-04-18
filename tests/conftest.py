@@ -1,4 +1,5 @@
 """Pytest fixtures for the Subfinder agent"""
+import random
 
 import pytest
 import pathlib
@@ -17,7 +18,7 @@ def  fixture_subfinder_agent():
             bus_url='NA',
             bus_exchange_topic='NA',
             args=[],
-            healthcheck_port=5301,
+            healthcheck_port=random.randint(5000, 6000),
             redis_url='redis://guest:guest@localhost:6379')
 
         agent = subfinder_agent.SubfinderAgent(definition, settings)
