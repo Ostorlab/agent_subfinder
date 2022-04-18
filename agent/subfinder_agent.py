@@ -41,7 +41,10 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         """
         logger.info('processing message of selector : %s', message.selector)
         domain_name = message.data['name']
-        canonalized_domain = tld.get_tld(domain_name, as_object=True, fix_protocol=True)
+        canonalized_domain = tld.get_tld(domain_name, as_object=True, fix_protocol=True, fail_silently=True)
+        if canonalized_domain is None:
+            return
+
         canonalized_domain = canonalized_domain.fld
 
         if self.set_add(STORAGE_NAME, canonalized_domain) is True:

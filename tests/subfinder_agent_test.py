@@ -40,3 +40,11 @@ def testAgentSubfinder_whenDomainHasAlreadyBeenProcessed_theDomainIsSkipped(subf
     subfinder_agent.process(msg)
 
     assert len(agent_mock) == 3
+
+def testAgentSubfinder_withInvalidTLD_doNotRaiseAnException(subfinder_agent, agent_persist_mock, agent_mock):
+    """Unittest for Agent Subfinder, when the TLD is invalid, the agent exists without raising an exception."""
+    msg = message.Message.from_data(selector='v3.asset.domain_name', data={'name': 'somedomain.invalidtld'})
+
+    subfinder_agent.process(msg)
+
+    assert len(agent_mock) == 0
