@@ -51,6 +51,9 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
             with subfinder.SubFinder() as subfinder_handler:
                 sub_domains = subfinder_handler.discover(domain_name)
 
+                if self.args.get('max_subdomains') is not None:
+                    sub_domains = sub_domains[:self.args.get('max_subdomains')]
+
                 for sub in sub_domains:
                     self.emit(selector='v3.asset.domain_name', data={'name': sub})
 
