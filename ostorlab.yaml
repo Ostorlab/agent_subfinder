@@ -55,5 +55,5 @@ docker_file_path : Dockerfile
 docker_build_root : .
 args:
   - name: "max_subdomains"
-    type: "int"
+    type: "number"
     description: "Maximum number of subdomains to return"
