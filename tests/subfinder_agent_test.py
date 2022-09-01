@@ -1,6 +1,6 @@
 """Unittests for the Subfinder Agent."""
 
-from ostorlab.agent import message
+from ostorlab.agent.message import message
 
 
 def testAgentSubfinder_whenFindsSubDomains_emitsBackFindings(subfinder_agent, agent_mock, agent_persist_mock, mocker):
