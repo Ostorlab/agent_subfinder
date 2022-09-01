@@ -4,7 +4,7 @@ import logging
 from rich import logging as rich_logging
 import tld
 from ostorlab.agent import agent
-from ostorlab.agent import message as m
+from ostorlab.agent.message import message as m
 from ostorlab.agent.mixins import agent_persist_mixin
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
@@ -28,7 +28,6 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
     def __init__(self,
                 agent_definition: agent_definitions.AgentDefinition,
                 agent_settings: runtime_definitions.AgentSettings) -> None:
-
         agent.Agent.__init__(self, agent_definition, agent_settings)
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
