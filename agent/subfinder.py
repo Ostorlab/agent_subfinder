@@ -11,22 +11,25 @@ logger = logging.getLogger(__name__)
 
 class SubFinder:
     """Class responsible for executing & processing output of the Subfinder discovery tool."""
+
     _output_file = None
 
     def __enter__(self):
-        self._output_file = tempfile.NamedTemporaryFile(suffix='.txt', prefix='subfinder', dir='/tmp')
+        self._output_file = tempfile.NamedTemporaryFile(
+            suffix=".txt", prefix="subfinder", dir="/tmp"
+        )
         return self
 
     def _subdomain_discovery(self, domain: str, output_file: io.TextIOWrapper) -> None:
         """Runs the subfinder command."""
-        logger.info('starting subdomain discovery for %s', domain)
-        command = ['subfinder', '-d', domain, '-o',  output_file.name]
+        logger.info("starting subdomain discovery for %s", domain)
+        command = ["subfinder", "-d", domain, "-o", output_file.name]
 
         subprocess.run(command, check=True)
 
     def _parse_output(self, output_file: io.TextIOWrapper) -> List[str]:
         """Reads the output of the subfinder tool, & returns a list of subdomains."""
-        with open(output_file.name, 'r', encoding='utf-8') as f:
+        with open(output_file.name, "r", encoding="utf-8") as f:
             sub_domains = f.read().splitlines()
         return sub_domains
 
