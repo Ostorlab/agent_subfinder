@@ -6,7 +6,7 @@ WORKDIR /install
 COPY requirement.txt /requirement.txt
 RUN pip install --prefix=/install -r /requirement.txt
 
-FROM golang:1.19-alpine AS go-build-env
+FROM golang:1.21-alpine AS go-build-env
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 
 FROM base
