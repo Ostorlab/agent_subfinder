@@ -1,4 +1,4 @@
-FROM python:3.10-alpine as base
+FROM python:3.11-alpine as base
 FROM base as builder
 RUN apk add build-base
 RUN mkdir /install
@@ -24,4 +24,4 @@ WORKDIR /root/.config/subfinder/
 RUN touch provider-config.yaml
 
 WORKDIR /app
-CMD ["python3", "/app/agent/subfinder_agent.py"]
+CMD ["python3.11", "/app/agent/subfinder_agent.py"]
