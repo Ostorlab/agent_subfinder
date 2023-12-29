@@ -72,3 +72,26 @@ def testAgentSubfinder_whenMaxSubDomainsSet_emitsBackFindings(
     assert agent_mock[0].selector == "v3.asset.domain_name", (
         agent_mock[0].data["name"] == "subdomain1"
     )
+
+
+def testAgentSubfinder_whenSubDomainIsInvalid_theSubDomainIsNotReported(
+    subfinder_agent, agent_persist_mock, agent_mock, mocker
+):
+    """Unittest for Agent Subfinder. When it receives an invalid subdomain from subfinder
+    the agent should skip it."""
+    del agent_persist_mock
+    subfinder_output = [
+        "subdomain1.co",
+        "subdomain2.co",
+        "-badsubdomain1.co",
+        "badsubdomain2-.co",
+        "subdomain3.co",
+    ]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+    msg = message.Message.from_data(
+        selector="v3.asset.domain_name", data={"name": "somedomain.com"}
+    )
+
+    subfinder_agent.process(msg)
+
+    assert len(agent_mock) == 3

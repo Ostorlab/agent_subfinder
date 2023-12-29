@@ -8,6 +8,7 @@ from ostorlab.agent.message import message as m
 from ostorlab.agent.mixins import agent_persist_mixin
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
+import validators
 
 from agent import subfinder
 
@@ -59,7 +60,13 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                     sub_domains = sub_domains[: self.args.get("max_subdomains")]
 
                 for sub in sub_domains:
-                    self.emit(selector="v3.asset.domain_name", data={"name": sub})
+                    try:
+                        if validators.domain(sub) is True:
+                            self.emit(
+                                selector="v3.asset.domain_name", data={"name": sub}
+                            )
+                    except validators.ValidationError:
+                        logger.info("Got an invalid subdomain: %s", sub)
 
         else:
             logger.info("%s has already been processed. skipping for now.", domain_name)
