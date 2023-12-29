@@ -77,7 +77,7 @@ def testAgentSubfinder_whenMaxSubDomainsSet_emitsBackFindings(
 def testAgentSubfinder_whenSubDomainIsInvalid_theSubDomainIsNotReported(
     subfinder_agent, agent_persist_mock, agent_mock, mocker
 ):
-    """Unittest for Agent Subfinder. When it receives an invalid subdomain from subfinder
+    """Unit test for Agent Subfinder. When it receives an invalid subdomain from subfinder
     the agent should skip it."""
     del agent_persist_mock
     subfinder_output = [
