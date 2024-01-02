@@ -66,7 +66,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                                 selector="v3.asset.domain_name", data={"name": sub}
                             )
                     except validators.ValidationError:
-                        logger.info("Got an invalid subdomain: %s", sub)
+                        logger.warning("Got an invalid subdomain: %s", sub)
 
         else:
             logger.info("%s has already been processed. skipping for now.", domain_name)
