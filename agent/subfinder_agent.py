@@ -59,6 +59,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                     sub_domains = sub_domains[: self.args.get("max_subdomains")]
 
                 for sub in sub_domains:
+                    logger.info("Found subdomain: %s", sub)
                     self.emit(selector="v3.asset.domain_name", data={"name": sub})
 
         else:
