@@ -1,4 +1,5 @@
 """Pytest fixtures for the Subfinder agent"""
+
 import random
 import json
 

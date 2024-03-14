@@ -1,4 +1,5 @@
 """Agent implementation for Subfinder : subdomain discovery tool that discovers valid subdomains for websites."""
+
 import logging
 
 from rich import logging as rich_logging
