@@ -9,7 +9,7 @@ FROM golang:1.21-alpine AS go-build-env
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 
 FROM base
-RUN apt-get update && apt-get install -y  bind9 dnsutils ca-certificates
+RUN apt-get update && apt-get install -y bind9 dnsutils ca-certificates
 COPY --from=builder /install /usr/local
 COPY --from=go-build-env /go/bin/subfinder /usr/local/bin/subfinder
 RUN mkdir -p /app/agent
