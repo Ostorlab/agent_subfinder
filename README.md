@@ -12,7 +12,7 @@ _Subfinder agent is a subdomain discovery tool that discovers valid subdomains f
 <img src="https://github.com/Ostorlab/agent_subfinder/blob/main/images/logo.png" alt="agent-subfinder" />
 </p>
 
-This repository is an implementation of [Ostorlab Agent](https://pypi.org/project/ostorlab/) for [Subfinder](https://github.com/projectdiscovery/subfinder) discovery tool by by ProjectDiscovery.
+This repository is an implementation of [OXO Agent](https://pypi.org/project/ostorlab/) for [Subfinder](https://github.com/projectdiscovery/subfinder) discovery tool by by ProjectDiscovery.
 
 ## Getting Started
 The Subfinder Agent works collectively with other agents. Its job; from a domain name, discover all subdomains in a fast and efficient way, 
@@ -22,29 +22,29 @@ and pass its findings to other agents responsible for scanning the subdomains, f
 To perform your first scan, simply run the following command:
 
 ```shell
-ostorlab scan run --install --agent agent/ostorlab/subfinder --agent agent/ostorlab/nuclei domain-name your-domain.com
+oxo scan run --install --agent agent/ostorlab/subfinder --agent agent/ostorlab/nuclei domain-name your-domain.com
 ```
 
 This command will download and install agents  `agent/ostorlab/subfinder` & `agent/ostorlab/nuclei` and target the domain  `your-domain`.
 Nuclei Agent will scan for <your-domain>, and waits for all subdomains found by the Subfinder Agent to performe other scans.
 You can use any Agent expecting <v3.asset.domain_name> as an in-selector, like Nmap, OpenVas, etc.
 
-For more information, please refer to the [Ostorlab Documentation](https://github.com/Ostorlab/ostorlab/blob/main/README.md)
+For more information, please refer to the [OXO Documentation](https://oxo.ostorlab.co/docs)
 
 
 ## Usage
 
-Agent Subfinder can be installed directly from the ostorlab agent store or built from this repository.
+Agent Subfinder can be installed directly from the oxo agent store or built from this repository.
 
- ### Install directly from ostorlab agent store
+ ### Install directly from oxo agent store
 
  ```shell
- ostorlab agent install agent/ostorlab/subfinder
+ oxo agent install agent/ostorlab/subfinder
  ```
 
 ### Build directly from the repository
 
- 1. To build the Subfinder agent you need to have [ostorlab](https://pypi.org/project/ostorlab/) installed in your machine. If you have already installed ostorlab, you can skip this step.
+ 1. To build the Subfinder agent you need to have [oxo](https://pypi.org/project/ostorlab/) installed in your machine. If you have already installed oxo, you can skip this step.
 
 ```shell
 pip3 install ostorlab
@@ -56,21 +56,22 @@ pip3 install ostorlab
 git clone https://github.com/Ostorlab/agent_subfinder.git && cd agent_subfinder
 ```
 
- 3. Build the agent image using ostorlab cli.
+ 3. Build the agent image using oxo cli.
 
  ```shell
- ostortlab agent build --file=ostorlab.yaml
+ oxo agent build --file=ostorlab.yaml
  ```
  You can pass the optional flag `--organization` to specify your organisation. The organization is empty by default.
 
  4. Run the agent using on of the following commands:
 	 * If you did not specify an organization when building the image:
 	  ```shell
-	  ostorlab scan run --agent agent//subfinder --agent agent//nuclei domain-name your-domain.com
+	  oxo scan run --agent agent//subfinder --agent agent//nuclei domain-name your-domain.com
 	  ```
 	 * If you specified an organization when building the image:
 	  ```shell
-	  ostorlab scan run --agent agent/[ORGANIZATION]/subfinder --agent agent/[ORGANIZATION]/nuclei  domain-name your-domain.com
+	  oxo scan run --agent agent/[ORGANIZATION]/subfinder --agent agent/[ORGANIZATION]/nuclei  domain-name your-domain.com
+      ```
 
 
 ## License
