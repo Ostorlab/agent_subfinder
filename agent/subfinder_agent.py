@@ -2,6 +2,7 @@
 
 import logging
 
+import yaml
 from rich import logging as rich_logging
 import tld
 from ostorlab.agent import agent
@@ -24,6 +25,33 @@ logger = logging.getLogger(__name__)
 STORAGE_NAME = "agent_subfinder_storage"
 
 
+def update_provider_config(
+    virustotal_key: str,
+    config_path: str = "/root/.config/subfinder/provider-config.yaml",
+) -> None:
+    """Update the Subfinder provider configuration file with the VirusTotal API key."""
+    try:
+        with open(config_path, "r") as config_file:
+            config = yaml.safe_load(config_file) or {}
+    except FileNotFoundError:
+        config = {}
+
+    # Update the 'virustotal' section
+    if "virustotal" in config:
+        if virustotal_key not in config["virustotal"]:
+            config["virustotal"].append(virustotal_key)  # Avoid duplicate keys
+    else:
+        config["virustotal"] = [virustotal_key]  # Add a new entry
+
+    # Write back the updated configuration
+    try:
+        with open(config_path, "w") as config_file:
+            yaml.safe_dump(config, config_file)
+        logger.info("VirusTotal API key has been added to the configuration.")
+    except (IOError, OSError) as write_error:
+        logger.error("Failed to write configuration file: %s", write_error)
+
+
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
     """Subfinder agent implementation."""
 
@@ -33,6 +61,12 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         agent_settings: runtime_definitions.AgentSettings,
     ) -> None:
         agent.Agent.__init__(self, agent_definition, agent_settings)
+
+        virustotal_key = self.args.get("virustotal_key")
+        if virustotal_key is not None:
+            logger.info("Updating configuration with VirusTotal API key.")
+            update_provider_config(virustotal_key)
+
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
     def process(self, message: m.Message) -> None:
