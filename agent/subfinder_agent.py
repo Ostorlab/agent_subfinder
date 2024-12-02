@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 STORAGE_NAME = "agent_subfinder_storage"
 
 
-def update_provider_config(
+def _update_provider_config(
     virustotal_key: str,
     config_path: str = "/root/.config/subfinder/provider-config.yaml",
 ) -> None:
@@ -65,7 +65,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         virustotal_key = self.args.get("virustotal_key")
         if virustotal_key is not None:
             logger.info("Updating configuration with VirusTotal API key.")
-            update_provider_config(virustotal_key)
+            _update_provider_config(virustotal_key)
 
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
