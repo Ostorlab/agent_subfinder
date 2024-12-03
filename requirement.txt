@@ -1,4 +1,4 @@
 ostorlab[agent]
 rich
 tld
-PyYAML
+ruamel.yaml

@@ -2,7 +2,7 @@
 
 import logging
 
-import yaml
+from ruamel.yaml import YAML
 from rich import logging as rich_logging
 import tld
 from ostorlab.agent import agent
@@ -30,11 +30,14 @@ def _update_provider_config(
     config_path: str = "/root/.config/subfinder/provider-config.yaml",
 ) -> None:
     """Update the Subfinder provider configuration file with the VirusTotal API key."""
+    yaml = YAML(typ="safe")
+    yaml.default_flow_style = False  # Ensure block-style lists
+    # Load existing configuration or initialize a new one
     try:
         with open(config_path, "r") as config_file:
-            config = yaml.safe_load(config_file) or {}
+            config = yaml.load(config_file) or {}
     except FileNotFoundError:
-        config = {}
+        logger.warning("Configuration file not found. Creating a new one.")
 
     # Update the 'virustotal' section
     if "virustotal" in config:
@@ -46,7 +49,7 @@ def _update_provider_config(
     # Write back the updated configuration
     try:
         with open(config_path, "w") as config_file:
-            yaml.safe_dump(config, config_file)
+            yaml.dump(config, config_file)
         logger.info("VirusTotal API key has been added to the configuration.")
     except (IOError, OSError) as write_error:
         logger.error("Failed to write configuration file: %s", write_error)
