@@ -2,7 +2,7 @@
 
 import logging
 
-from ruamel.yaml import YAML
+import ruamel.yaml
 from rich import logging as rich_logging
 import tld
 from ostorlab.agent import agent
@@ -31,7 +31,7 @@ def update_provider_config(
     config_path: str = CONFIG_PATH,
 ) -> None:
     """Update the Subfinder provider configuration file with the VirusTotal API key."""
-    yaml = YAML(typ="safe")
+    yaml = ruamel.yaml.YAML(typ="safe")
     yaml.default_flow_style = False  # Ensure block-style lists
     # Load existing configuration or initialize a new one
     try:
