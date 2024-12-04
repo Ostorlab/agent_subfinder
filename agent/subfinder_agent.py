@@ -23,11 +23,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 STORAGE_NAME = "agent_subfinder_storage"
+CONFIG_PATH = "/root/.config/subfinder/provider-config.yaml"
 
 
 def _update_provider_config(
     virustotal_key: str,
-    config_path: str = "/root/.config/subfinder/provider-config.yaml",
+    config_path: str = CONFIG_PATH,
 ) -> None:
     """Update the Subfinder provider configuration file with the VirusTotal API key."""
     yaml = YAML(typ="safe")
