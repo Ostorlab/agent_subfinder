@@ -26,7 +26,7 @@ STORAGE_NAME = "agent_subfinder_storage"
 CONFIG_PATH = "/root/.config/subfinder/provider-config.yaml"
 
 
-def _update_provider_config(
+def update_provider_config(
     virustotal_key: str,
     config_path: str = CONFIG_PATH,
 ) -> None:
@@ -38,8 +38,8 @@ def _update_provider_config(
         with open(config_path, "r") as config_file:
             config = yaml.load(config_file) or {}
     except FileNotFoundError:
-        logger.warning("Configuration file not found. Creating a new one.")
-
+        logger.error("Configuration file not found. Creating a new one.")
+        return
     # Update the 'virustotal' section
     if "virustotal" in config:
         if virustotal_key not in config["virustotal"]:
@@ -69,7 +69,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         virustotal_key = self.args.get("virustotal_key")
         if virustotal_key is not None:
             logger.info("Updating configuration with VirusTotal API key.")
-            _update_provider_config(virustotal_key)
+            update_provider_config(virustotal_key)
 
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
