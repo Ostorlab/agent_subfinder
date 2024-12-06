@@ -122,7 +122,7 @@ def testSetVirusTotalApiKey_whenWriteConfigurationFail_handleWriteError(
 
     sub_agent.set_virustotal_api_key(
         "existing_key",
-        str(pathlib.Path(__file__).parent / "provider-config-virustotal.yaml"),
+        str(pathlib.Path(__file__).parent / "provider-config.yaml"),
     )
 
     assert "Failed to write configuration file" in caplog.text
