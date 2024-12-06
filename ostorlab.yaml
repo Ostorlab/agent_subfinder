@@ -60,3 +60,6 @@ args:
   - name: "max_subdomains"
     type: "number"
     description: "Maximum number of subdomains to return"
+  - name : "virustotal_api_key"
+    type: "string"
+    description: "Adding VirusTotal api key to get more data"

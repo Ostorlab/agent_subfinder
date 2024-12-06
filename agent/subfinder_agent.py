@@ -1,7 +1,9 @@
 """Agent implementation for Subfinder : subdomain discovery tool that discovers valid subdomains for websites."""
 
 import logging
+import pathlib
 
+import ruamel.yaml
 from rich import logging as rich_logging
 import tld
 from ostorlab.agent import agent
@@ -22,6 +24,35 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 STORAGE_NAME = "agent_subfinder_storage"
+CONFIG_PATH = "/root/.config/subfinder/provider-config.yaml"
+
+
+def set_virustotal_api_key(
+    virustotal_key: str,
+    config_path: str = CONFIG_PATH,
+) -> None:
+    """Update the Subfinder provider configuration file with the VirusTotal API key."""
+    yaml = ruamel.yaml.YAML(typ="safe")
+    yaml.default_flow_style = False  # Ensure block-style lists
+    config_path = pathlib.Path(config_path)
+
+    if config_path.exists() is False:
+        logger.error("Configuration file not found at %s.", config_path)
+        return None
+
+    config = yaml.load(config_path.read_text()) or {}
+
+    if "virustotal" in config:
+        if virustotal_key not in config["virustotal"]:
+            config["virustotal"].append(virustotal_key)
+    else:
+        config["virustotal"] = [virustotal_key]
+
+    try:
+        with config_path.open("w") as file:
+            yaml.dump(config, file)
+    except (IOError, OSError) as write_error:
+        logger.error("Failed to write configuration file: %s", write_error)
 
 
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
@@ -33,6 +64,12 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         agent_settings: runtime_definitions.AgentSettings,
     ) -> None:
         agent.Agent.__init__(self, agent_definition, agent_settings)
+
+        virustotal_key = self.args.get("virustotal_api_key")
+        if virustotal_key is not None:
+            logger.info("Updating configuration with VirusTotal API key.")
+            set_virustotal_api_key(virustotal_key)
+
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
     def process(self, message: m.Message) -> None:
