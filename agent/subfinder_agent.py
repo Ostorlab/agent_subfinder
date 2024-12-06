@@ -1,6 +1,7 @@
 """Agent implementation for Subfinder : subdomain discovery tool that discovers valid subdomains for websites."""
 
 import logging
+import pathlib
 
 import ruamel.yaml
 from rich import logging as rich_logging
@@ -26,32 +27,33 @@ STORAGE_NAME = "agent_subfinder_storage"
 CONFIG_PATH = "/root/.config/subfinder/provider-config.yaml"
 
 
-def update_provider_config(
+def set_virustotal_api_key(
     virustotal_key: str,
     config_path: str = CONFIG_PATH,
 ) -> None:
     """Update the Subfinder provider configuration file with the VirusTotal API key."""
     yaml = ruamel.yaml.YAML(typ="safe")
     yaml.default_flow_style = False  # Ensure block-style lists
-    # Load existing configuration or initialize a new one
-    try:
-        with open(config_path, "r") as config_file:
-            config = yaml.load(config_file) or {}
-    except FileNotFoundError:
-        logger.error("Configuration file not found. Creating a new one.")
-        return
-    # Update the 'virustotal' section
+    config_path = pathlib.Path(config_path)
+
+    if config_path.exists() is False:
+        logger.error("Configuration file not found at %s.", config_path)
+        return None
+
+    config = yaml.load(config_path.read_text()) or {}
+
     if "virustotal" in config:
         if virustotal_key not in config["virustotal"]:
-            config["virustotal"].append(virustotal_key)  # Avoid duplicate keys
+            config["virustotal"].append(virustotal_key)
     else:
-        config["virustotal"] = [virustotal_key]  # Add a new entry
+        # add to sources
+        if "sources" in config and "virustotal" not in config["sources"]:
+            config["sources"].append("virustotal")
+        config["virustotal"] = [virustotal_key]
 
-    # Write back the updated configuration
     try:
-        with open(config_path, "w") as config_file:
-            yaml.dump(config, config_file)
-        logger.info("VirusTotal API key has been added to the configuration.")
+        with config_path.open("w") as file:
+            yaml.dump(config, file)
     except (IOError, OSError) as write_error:
         logger.error("Failed to write configuration file: %s", write_error)
 
@@ -66,10 +68,10 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
     ) -> None:
         agent.Agent.__init__(self, agent_definition, agent_settings)
 
-        virustotal_key = self.args.get("virustotal_key")
+        virustotal_key = self.args.get("virustotal_api_key")
         if virustotal_key is not None:
             logger.info("Updating configuration with VirusTotal API key.")
-            update_provider_config(virustotal_key)
+            set_virustotal_api_key(virustotal_key)
 
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 

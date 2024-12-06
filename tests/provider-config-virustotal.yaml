@@ -1,0 +1,24 @@
+resolvers:
+    - 1.1.1.1
+    - 1.0.0.1
+    - 8.8.8.8
+    - 8.8.4.4
+    - 9.9.9.9
+
+sources:
+    - github
+    - zoomeyeapi
+    - quake
+    - virustotal
+
+github:
+  - ghp_lkyJGU3jv1xmwk4SDXavrLDJ4dl2pSJMzj4X
+  - ghp_gkUuhkIYdQPj13ifH4KA3cXRn8JD2lqir2d4
+zoomeyeapi:
+  - 4f73021d-ff95-4f53-937f-83d6db719eec
+quake:
+  - 0cb9030c-0a40-48a3-b8c4-fca28e466ba3
+virustotal:
+  - example-api-key
+
+subfinder-version: 2.4.5

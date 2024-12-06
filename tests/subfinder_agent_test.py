@@ -4,6 +4,8 @@ import pathlib
 
 import pytest
 from pytest_mock import plugin
+import ruamel.yaml
+from pyfakefs import fake_filesystem_unittest
 
 from ostorlab.agent.message import message
 from agent import subfinder_agent as sub_agent
@@ -82,7 +84,7 @@ def testAgentSubfinder_whenMaxSubDomainsSet_emitsBackFindings(
     )
 
 
-def testAgentSubfinder_whenVirustotalKeyPassed_emitsBackFindings(
+def testAgentSubfinder_always_callsSetVirusTotalKeyInInit(
     subfinder_definition: agent_definitions.AgentDefinition,
     subfinder_settings: runtime_definitions.AgentSettings,
     mocker: plugin.MockerFixture,
@@ -91,35 +93,105 @@ def testAgentSubfinder_whenVirustotalKeyPassed_emitsBackFindings(
     Test that the Subfinder agent correctly updates the provider configuration
     with the VirusTotal key.
     """
-    mocker_update_provider_config = mocker.patch(
-        "agent.subfinder_agent.update_provider_config"
+    mocker_set_virustotal_api_key = mocker.patch(
+        "agent.subfinder_agent.set_virustotal_api_key"
     )
 
     sub_agent.SubfinderAgent(subfinder_definition, subfinder_settings)
 
-    assert mocker_update_provider_config.called is True
-    assert mocker_update_provider_config.call_args[0][0] == "Justrandomvalue"
+    assert mocker_set_virustotal_api_key.called is True
+    assert mocker_set_virustotal_api_key.call_args[0][0] == "Justrandomvalue"
 
 
-def testUpdateConfigurationFile_whenConfNotFound_handelFileNotFoundError(
+def testSetVirusTotalApiKey_whenConfFileNotFound_returnNoneAndLogError(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that the provider configuration correctly handles a missing configuration file."""
 
-    sub_agent.update_provider_config("existing_key", "test_not.yaml")
+    sub_agent.set_virustotal_api_key("existing_key", "test_not.yaml")
 
-    assert "Configuration file not found. Creating a new one." in caplog.text
+    assert "Configuration file not found at test_not.yaml." in caplog.text
 
 
-def testupdateconfigupdate_whenWriteConfigurationFail_handelWriteErro(
+def testSetVirusTotalApiKey_whenWriteConfigurationFail_handleWriteError(
     mocker: plugin.MockerFixture,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that the provider configuration handles a write error correctly and logs the failure."""
     mocker.patch("ruamel.yaml.main.YAML.dump", side_effect=FileNotFoundError)
 
-    sub_agent.update_provider_config(
+    sub_agent.set_virustotal_api_key(
         "existing_key", str(pathlib.Path(__file__).parent / "provider-config.yaml")
     )
 
     assert "Failed to write configuration file" in caplog.text
+
+
+def testSetVirusTotalApiKey_createsSectionAndAddsKeyWhenNoSectionExists() -> None:
+    """
+    Test that the function creates a `virustotal` section and adds the key
+    when it does not exist in the configuration.
+    """
+    real_file_path = (
+        pathlib.Path(__file__).parent / "provider-config-no-virustotal.yaml"
+    )
+    fake_file_path = "/fake/path/provider-config-no-virustotal.yaml"
+    file_contents = real_file_path.read_text()
+
+    with fake_filesystem_unittest.Patcher() as patcher:
+        patcher.fs.create_file(fake_file_path, contents=file_contents)
+
+        sub_agent.set_virustotal_api_key("new_key", fake_file_path)
+
+        yaml = ruamel.yaml.YAML(typ="safe")
+        fake_file = pathlib.Path(fake_file_path)
+        updated_config = yaml.load(fake_file.read_text()) or {}
+        assert "virustotal" in updated_config
+        assert updated_config["virustotal"] == ["new_key"]
+        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
+
+
+def testSetVirusTotalApiKey_whenVirusTotalSectionExists_addsKeyToExistingSection() -> (
+    None
+):
+    """
+    Test that the function adds the key to the existing `virustotal` section
+    when it already exists in the configuration.
+    """
+    real_file_path = pathlib.Path(__file__).parent / "provider-config-virustotal.yaml"
+    fake_file_path = "/fake/path/provider-config-virustotal.yaml"
+    file_contents = real_file_path.read_text()
+
+    with fake_filesystem_unittest.Patcher() as patcher:
+        patcher.fs.create_file(fake_file_path, contents=file_contents)
+
+        sub_agent.set_virustotal_api_key("new_key", fake_file_path)
+
+        yaml = ruamel.yaml.YAML(typ="safe")
+        fake_file = pathlib.Path(fake_file_path)
+        updated_config = yaml.load(fake_file.read_text()) or {}
+        assert "virustotal" in updated_config
+        assert updated_config["virustotal"] == ["example-api-key", "new_key"]
+        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
+
+
+def testSetVirusTotalApiKey_whenKeyAlreadyExists_doesNotAddKeyAgain() -> None:
+    """
+    Test that the function does not add the key to the `virustotal` section
+    when it already exists in the configuration.
+    """
+    real_file_path = pathlib.Path(__file__).parent / "provider-config-virustotal.yaml"
+    fake_file_path = "/fake/path/provider-config-virustotal.yaml"
+    file_contents = real_file_path.read_text()
+
+    with fake_filesystem_unittest.Patcher() as patcher:
+        patcher.fs.create_file(fake_file_path, contents=file_contents)
+
+        sub_agent.set_virustotal_api_key("example-api-key", fake_file_path)
+
+        yaml = ruamel.yaml.YAML(typ="safe")
+        fake_file = pathlib.Path(fake_file_path)
+        updated_config = yaml.load(fake_file.read_text()) or {}
+        assert "virustotal" in updated_config
+        assert updated_config["virustotal"] == ["example-api-key"]
+        assert "sources" in updated_config and "virustotal" in updated_config["sources"]

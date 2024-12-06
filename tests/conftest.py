@@ -57,7 +57,7 @@ def subfinder_definition() -> agent_definitions.AgentDefinition:
         definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
         definition.args = [
             {
-                "name": "virustotal_key",
+                "name": "virustotal_api_key",
                 "value": "Justrandomvalue",
                 "type": "string",
             },
