@@ -118,10 +118,11 @@ def testSetVirusTotalApiKey_whenWriteConfigurationFail_handleWriteError(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that the provider configuration handles a write error correctly and logs the failure."""
-    mocker.patch("ruamel.yaml.main.YAML.dump", side_effect=FileNotFoundError)
+    mocker.patch("ruamel.yaml.main.YAML.dump", side_effect=IOError)
 
     sub_agent.set_virustotal_api_key(
-        "existing_key", str(pathlib.Path(__file__).parent / "provider-config.yaml")
+        "existing_key",
+        str(pathlib.Path(__file__).parent / "provider-config-virustotal.yaml"),
     )
 
     assert "Failed to write configuration file" in caplog.text
@@ -194,4 +195,24 @@ def testSetVirusTotalApiKey_whenKeyAlreadyExists_doesNotAddKeyAgain() -> None:
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["example-api-key"]
+        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
+
+
+def testSetVirusTotalApiKey_whenFileEmpty_createSourcesAndAddVirusTotalKey() -> None:
+    """
+    Test that the function creates a `sources` section and adds the `virustotal` key
+    when the configuration file is empty.
+    """
+    fake_file_path = "/fake/path/provider-config-empty.yaml"
+
+    with fake_filesystem_unittest.Patcher() as patcher:
+        patcher.fs.create_file(fake_file_path, contents="")
+
+        sub_agent.set_virustotal_api_key("new_key", fake_file_path)
+
+        yaml = ruamel.yaml.YAML(typ="safe")
+        fake_file = pathlib.Path(fake_file_path)
+        updated_config = yaml.load(fake_file.read_text()) or {}
+        assert "virustotal" in updated_config
+        assert updated_config["virustotal"] == ["new_key"]
         assert "sources" in updated_config and "virustotal" in updated_config["sources"]

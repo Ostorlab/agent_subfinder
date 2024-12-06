@@ -47,7 +47,9 @@ def set_virustotal_api_key(
             config["virustotal"].append(virustotal_key)
     else:
         # add to sources
-        if "sources" in config and "virustotal" not in config["sources"]:
+        if "sources" not in config:
+            config["sources"] = ["virustotal"]
+        elif "virustotal" not in config["sources"]:
             config["sources"].append("virustotal")
         config["virustotal"] = [virustotal_key]
 
