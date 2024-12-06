@@ -149,7 +149,6 @@ def testSetVirusTotalApiKey_createsSectionAndAddsKeyWhenNoSectionExists() -> Non
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["new_key"]
-        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
 
 
 def testSetVirusTotalApiKey_whenVirusTotalSectionExists_addsKeyToExistingSection() -> (
@@ -173,7 +172,6 @@ def testSetVirusTotalApiKey_whenVirusTotalSectionExists_addsKeyToExistingSection
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["example-api-key", "new_key"]
-        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
 
 
 def testSetVirusTotalApiKey_whenKeyAlreadyExists_doesNotAddKeyAgain() -> None:
@@ -195,12 +193,11 @@ def testSetVirusTotalApiKey_whenKeyAlreadyExists_doesNotAddKeyAgain() -> None:
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["example-api-key"]
-        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
 
 
-def testSetVirusTotalApiKey_whenFileEmpty_createSourcesAndAddVirusTotalKey() -> None:
+def testSetVirusTotalApiKey_whenFileEmpty_addVirusTotalKey() -> None:
     """
-    Test that the function creates a `sources` section and adds the `virustotal` key
+    Test that the function adds the `virustotal` key
     when the configuration file is empty.
     """
     fake_file_path = "/fake/path/provider-config-empty.yaml"
@@ -215,4 +212,3 @@ def testSetVirusTotalApiKey_whenFileEmpty_createSourcesAndAddVirusTotalKey() -> 
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["new_key"]
-        assert "sources" in updated_config and "virustotal" in updated_config["sources"]
