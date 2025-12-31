@@ -1,12 +1,13 @@
 FROM python:3.11-slim as base
 FROM base as builder
+RUN apt-get update && apt-get install -y gcc g++ python3-dev && rm -rf /var/lib/apt/lists/*
 RUN mkdir /install
 WORKDIR /install
 COPY requirement.txt /requirement.txt
 RUN pip install --upgrade pip && pip install --prefix=/install -r /requirement.txt
 
-FROM golang:1.21-alpine AS go-build-env
-RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+FROM golang:1.23-alpine AS go-build-env
+RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@v2.6.8
 
 FROM base
 RUN apt-get update && apt-get install -y bind9 dnsutils ca-certificates
