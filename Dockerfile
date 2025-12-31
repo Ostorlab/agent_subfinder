@@ -3,7 +3,7 @@ FROM base as builder
 RUN mkdir /install
 WORKDIR /install
 COPY requirement.txt /requirement.txt
-RUN pip install --prefix=/install -r /requirement.txt
+RUN pip install --upgrade pip && pip install --prefix=/install -r /requirement.txt
 
 FROM golang:1.21-alpine AS go-build-env
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
