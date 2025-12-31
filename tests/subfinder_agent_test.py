@@ -14,18 +14,18 @@ from ostorlab.runtimes import definitions as runtime_definitions
 
 
 def testAgentSubfinder_whenFindsSubDomains_emitsBackFindings(
-    subfinder_agent, agent_mock, agent_persist_mock, mocker
-):
-    """Unittest for emitting back the found subdomains of the agent Subfinder."""
+    subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Unit test for emitting back the found subdomains of the agent Subfinder."""
     del agent_persist_mock
     subfinder_output = ["subdomain1.co", "subdomain2.co", "subdomain3.co"]
-
     mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
 
-    msg = message.Message.from_data(
-        selector="v3.asset.domain_name", data={"name": "somedomain.com"}
-    )
-    subfinder_agent.process(msg)
+    subfinder_agent.process(domain_message)
 
     assert len(agent_mock) == 3
     assert agent_mock[0].selector == "v3.asset.domain_name", (
@@ -34,19 +34,20 @@ def testAgentSubfinder_whenFindsSubDomains_emitsBackFindings(
 
 
 def testAgentSubfinder_whenDomainHasAlreadyBeenProcessed_theDomainIsSkipped(
-    subfinder_agent, agent_persist_mock, agent_mock, mocker
-):
-    """Unittest for Agent Subfinder. When it receives a domain that has already been processed,
+    subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Unit test for Agent Subfinder. When it receives a domain that has already been processed,
     the agent should skip it."""
     del agent_persist_mock
     subfinder_output = ["subdomain1.co", "subdomain2.co", "subdomain3.co"]
     mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
-    msg = message.Message.from_data(
-        selector="v3.asset.domain_name", data={"name": "somedomain.com"}
-    )
 
-    subfinder_agent.process(msg)
-    subfinder_agent.process(msg)
+    subfinder_agent.process(domain_message)
+    subfinder_agent.process(domain_message)
 
     assert len(agent_mock) == 3
 
@@ -65,18 +66,18 @@ def testAgentSubfinder_withInvalidTLD_doNotRaiseAnException(
 
 
 def testAgentSubfinder_whenMaxSubDomainsSet_emitsBackFindings(
-    subfinder_agent_max_subdomains, agent_mock, agent_persist_mock, mocker
-):
-    """Unittest for emitting back the found subdomains of the agent Subfinder."""
+    subfinder_agent_max_subdomains: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Unit test for emitting back the found subdomains of the agent Subfinder."""
     del agent_persist_mock
     subfinder_output = ["subdomain1.co", "subdomain2.co", "subdomain3.co"]
-
     mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
 
-    msg = message.Message.from_data(
-        selector="v3.asset.domain_name", data={"name": "somedomain.com"}
-    )
-    subfinder_agent_max_subdomains.process(msg)
+    subfinder_agent_max_subdomains.process(domain_message)
 
     assert len(agent_mock) == 2
     assert agent_mock[0].selector == "v3.asset.domain_name", (
@@ -212,3 +213,25 @@ def testSetVirusTotalApiKey_whenFileEmpty_addVirusTotalKey() -> None:
         updated_config = yaml.load(fake_file.read_text()) or {}
         assert "virustotal" in updated_config
         assert updated_config["virustotal"] == ["new_key"]
+
+
+def testAgentSubfinder_whenActiveArg_subfinderCommandShouldHaveActiveFlagSet(
+    active_enumeration_subfinder: sub_agent.SubfinderAgent,
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Ensure that the `-active` & `-all` are set when the `use_all_sources` & `active_only` arguments are True."""
+    del agent_persist_mock
+    run_command_mock = mocker.patch("subprocess.run", return_value=None)
+
+    active_enumeration_subfinder.process(message=domain_message)
+
+    assert run_command_mock.called is True
+    run_command_args = run_command_mock.call_args_list[0].kwargs
+    subfinder_args = run_command_args["args"]
+    assert "subfinder" in subfinder_args
+    assert "-d" in subfinder_args
+    assert "somedomain.com" in subfinder_args
+    assert "-active" in subfinder_args
+    assert "-all" in subfinder_args

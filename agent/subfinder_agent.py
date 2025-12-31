@@ -69,7 +69,8 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         if virustotal_key is not None:
             logger.info("Updating configuration with VirusTotal API key.")
             set_virustotal_api_key(virustotal_key)
-
+        self._use_all_sources: bool = self.args.get("use_all_sources") or False
+        self._active_only: bool = self.args.get("active_only") or False
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
     def process(self, message: m.Message) -> None:
@@ -90,7 +91,9 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         canonalized_domain = canonalized_domain.fld
 
         if self.set_add(STORAGE_NAME, canonalized_domain) is True:
-            with subfinder.SubFinder() as subfinder_handler:
+            with subfinder.SubFinder(
+                use_all_sources=self._use_all_sources, active_only=self._active_only
+            ) as subfinder_handler:
                 sub_domains = subfinder_handler.discover(domain_name)
 
                 if self.args.get("max_subdomains") is not None:

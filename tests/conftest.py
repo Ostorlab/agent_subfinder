@@ -9,6 +9,7 @@ import pathlib
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 from ostorlab.utils import definitions as utils_definitions
+from ostorlab.agent.message import message
 
 from agent import subfinder_agent
 
@@ -76,3 +77,36 @@ def subfinder_settings() -> runtime_definitions.AgentSettings:
         redis_url="redis://guest:guest@localhost:6379",
     )
     return settings
+
+
+@pytest.fixture
+def active_enumeration_subfinder() -> subfinder_agent.SubfinderAgent:
+    with (pathlib.Path(__file__).parent.parent / "ostorlab.yaml").open() as yaml_o:
+        definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
+        settings = runtime_definitions.AgentSettings(
+            key="agent/ostorlab/subfinder",
+            bus_url="NA",
+            bus_exchange_topic="NA",
+            args=[
+                utils_definitions.Arg(
+                    name="use_all_sources",
+                    type="boolean",
+                    value=json.dumps(True).encode(),
+                ),
+                utils_definitions.Arg(
+                    name="active_only", type="boolean", value=json.dumps(True).encode()
+                ),
+            ],
+            healthcheck_port=random.randint(5000, 6000),
+            redis_url="redis://guest:guest@localhost:6379",
+        )
+
+        agent = subfinder_agent.SubfinderAgent(definition, settings)
+        return agent
+
+
+@pytest.fixture
+def domain_message() -> message.Message:
+    return message.Message.from_data(
+        selector="v3.asset.domain_name", data={"name": "somedomain.com"}
+    )

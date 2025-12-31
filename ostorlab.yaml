@@ -63,3 +63,11 @@ args:
   - name : "virustotal_api_key"
     type: "string"
     description: "Adding VirusTotal api key to get more data"
+  - name: use_all_sources
+    type: "boolean"
+    description: "Use all sources for enumeration (slow)"
+    value: false
+  - name: active_only
+    type: "boolean"
+    description: "Display active subdomains only"
+    value: false
