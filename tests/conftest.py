@@ -80,7 +80,7 @@ def subfinder_settings() -> runtime_definitions.AgentSettings:
 
 
 @pytest.fixture
-def active_enumeration_subfinder():
+def active_enumeration_subfinder() -> subfinder_agent.SubfinderAgent:
     with (pathlib.Path(__file__).parent.parent / "ostorlab.yaml").open() as yaml_o:
         definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
         settings = runtime_definitions.AgentSettings(
@@ -106,7 +106,7 @@ def active_enumeration_subfinder():
 
 
 @pytest.fixture
-def domain_message():
+def domain_message() -> message.Message:
     return message.Message.from_data(
         selector="v3.asset.domain_name", data={"name": "somedomain.com"}
     )

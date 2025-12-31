@@ -224,6 +224,7 @@ def testAgentSubfinder_whenActiveArg_subfinderCommandShouldHaveActiveFlagSet(
     """Ensure that the `-active` & `-all` are set when the `use_all_sources` & `active_only` arguments are True."""
     del agent_persist_mock
     run_command_mock = mocker.patch("subprocess.run", return_value=None)
+
     active_enumeration_subfinder.process(message=domain_message)
 
     assert run_command_mock.called is True
