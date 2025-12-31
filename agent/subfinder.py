@@ -13,6 +13,13 @@ logger = logging.getLogger(__name__)
 class SubFinder:
     """Class responsible for executing & processing output of the Subfinder discovery tool."""
 
+    def __init__(
+        self, use_all_sources: bool = False, active_only: bool = False
+    ) -> None:
+        """Initializes the Subfinder wrapper."""
+        self._use_all_sources = use_all_sources
+        self._active_only = active_only
+
     _output_file = None
 
     def __enter__(self):
@@ -25,8 +32,12 @@ class SubFinder:
         """Runs the subfinder command."""
         logger.info("starting subdomain discovery for %s", domain)
         command = ["subfinder", "-d", domain, "-o", output_file.name]
+        if self._use_all_sources is True:
+            command.append("-all")
+        if self._active_only is True:
+            command.append("-active")
 
-        subprocess.run(command, check=True)
+        subprocess.run(args=command, check=True)
 
     def _parse_output(self, output_file: io.TextIOWrapper) -> List[str]:
         """Reads the output of the subfinder tool, & returns a list of subdomains."""
