@@ -9,11 +9,11 @@ from ostorlab.runtimes import definitions as runtime_definitions
 
 from agent import subfinder
 
-from agent.config import logger, STORAGE_NAME , PROVIDER_ARG_MAP
+from agent.config import logger, STORAGE_NAME, PROVIDER_ARG_MAP
 from agent.provider_config_manager import ProviderConfigManager
 
 
-provider_config_manager =  ProviderConfigManager()
+provider_config_manager = ProviderConfigManager()
 
 
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
@@ -27,28 +27,47 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         agent.Agent.__init__(self, agent_definition, agent_settings)
 
         # Update providers configuration with API keys
-        providers_arg_names = PROVIDER_ARG_MAP.keys()
-        logger.info("Starting update of providers configuration with API keys.")
-
-        for provider_arg_name in providers_arg_names:
-            provider_api_key = self.args.get(provider_arg_name)
-
-            if provider_api_key:
-
-                provider_name = PROVIDER_ARG_MAP.get(provider_arg_name)
-
-                logger.info("Adding API key for provider '%s'.", provider_name)
-            
-                provider_config_manager.add_provider_key(provider_name, provider_api_key)
-            else:
-                logger.debug("No API key provided for provider argument '%s'; skipping.", provider_arg_name)
-
-        logger.info("Providers API keys configuration update completed.")
-
+        self.update_providers_api_keys(self.args)
 
         self._use_all_sources: bool = self.args.get("use_all_sources") or False
         self._active_only: bool = self.args.get("active_only") or False
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
+
+    def update_providers_api_keys(self, args: dict[str, str]) -> None:
+
+        # Update providers configuration with API keys from the provided arguments.
+
+        providers_arg_names = PROVIDER_ARG_MAP.keys()
+        logger.info("Starting update of providers configuration with API keys.")
+
+        for arg in args:
+            if arg not in providers_arg_names:
+                continue
+
+            provider_api_key = args.get(arg)
+            if not provider_api_key:
+                logger.debug(
+                    "No API key provided for provider argument '%s'; skipping.",
+                    arg,
+                )
+                continue
+
+            provider_name = PROVIDER_ARG_MAP.get(arg)
+            if not provider_name:
+                logger.warning(
+                    "No provider mapping found for argument '%s'; skipping.",
+                    arg,
+                )
+                continue
+
+            logger.info("Adding API key for provider '%s'.", provider_name)
+
+            provider_config_manager.add_provider_key(
+                provider_name,
+                provider_api_key,
+            )
+
+        logger.info("Providers API keys configuration update completed.")
 
     def process(self, message: m.Message) -> None:
         """Process messages of type  v3.asset.domain_name
