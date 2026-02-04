@@ -165,3 +165,50 @@ def testUpdateProvidersApiKeys_whenMultipleValidApiKeysProvided_addsAllKeysToPro
     add_provider_key_mock.assert_any_call("virustotal", "vt_key_123")
     add_provider_key_mock.assert_any_call("shodan", "shodan_key_456")
     add_provider_key_mock.assert_any_call("github", "github_key_789")
+
+
+def testAgentSubfinder_whenFindsSubdomains_logsFoundSubdomains(
+    subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Unit test to ensure subdomain discovery logging is executed."""
+    del agent_persist_mock
+    subfinder_output = ["subdomain1.co", "subdomain2.co"]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+    logger_info_mock = mocker.patch("agent.config.logger.info")
+
+    subfinder_agent.process(domain_message)
+
+    assert len(agent_mock) == 2
+    # Verify logging calls were made for subdomains
+    log_calls = [call for call in logger_info_mock.call_args_list if "Found subdomain" in str(call)]
+    assert len(log_calls) == 2
+
+
+def testAgentSubfinder_whenDomainAlreadyProcessed_logsSkipMessage(
+    subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    """Unit test to ensure skip logging is executed when domain was already processed."""
+    del agent_persist_mock
+    subfinder_output = ["subdomain1.co", "subdomain2.co", "subdomain3.co"]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+    logger_info_mock = mocker.patch("agent.config.logger.info")
+
+    # First call processes the domain
+    subfinder_agent.process(domain_message)
+    # Second call should skip it
+    subfinder_agent.process(domain_message)
+
+    # Verify the skip message was logged
+    skip_log_calls = [
+        call for call in logger_info_mock.call_args_list 
+        if "already been processed" in str(call)
+    ]
+    assert len(skip_log_calls) == 1
