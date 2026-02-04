@@ -5,7 +5,6 @@ import pathlib
 
 
 class ProviderConfigManager:
-
     """
     Manages API keys for providers in the Subfinder configuration file.
     """
@@ -13,7 +12,7 @@ class ProviderConfigManager:
     def __init__(self, config_path: str = CONFIG_PATH):
         self.config_path = config_path
 
-    def add_provider_key(self, provider_name: str, api_key : str) -> None:
+    def add_provider_key(self, provider_name: str, api_key: str) -> None:
         """
         Add an API key for a specific provider.
         """
@@ -24,9 +23,8 @@ class ProviderConfigManager:
         if not api_key:
             logger.error("API key cannot be empty for provider '%s'.", provider_name)
             return
-            
+
         self.__save_provider_key(provider_name, api_key)
-        
 
     def __save_provider_key(self, provider_name: str, api_key: str) -> None:
         """
@@ -56,7 +54,9 @@ class ProviderConfigManager:
                 config[provider_name].append(api_key)
                 logger.info("Added API key for provider '%s'.", provider_name)
             else:
-                logger.info("API key for provider '%s' already exists; skipping.", provider_name)
+                logger.info(
+                    "API key for provider '%s' already exists; skipping.", provider_name
+                )
         else:
             config[provider_name] = [api_key]
             logger.info("Created new provider entry '%s' with API key.", provider_name)
