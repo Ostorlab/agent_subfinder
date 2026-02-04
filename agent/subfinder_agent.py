@@ -41,7 +41,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
             
                 provider_config_manager.add_provider_key(provider_name, provider_api_key)
             else:
-                logger.debug("No API key provided for provider '%s'; skipping.", provider_name)
+                logger.debug("No API key provided for provider argument '%s'; skipping.", provider_arg_name)
 
         logger.info("Providers API keys configuration update completed.")
 
