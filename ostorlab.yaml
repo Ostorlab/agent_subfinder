@@ -60,9 +60,6 @@ args:
   - name: "max_subdomains"
     type: "number"
     description: "Maximum number of subdomains to return"
-  - name : "virustotal_api_key"
-    type: "string"
-    description: "Adding VirusTotal api key to get more data"
   - name: use_all_sources
     type: "boolean"
     description: "Use all sources for enumeration (slow)"
@@ -71,3 +68,199 @@ args:
     type: "boolean"
     description: "Display active subdomains only"
     value: false
+
+  - name: "virustotal_api_key"
+    type: "string"
+    description: "Adding VirusTotal API key to get more data"
+
+  - name: "alienvault_api_key"
+    type: "string"
+    description: "Adding AlienVault API key to get more data"
+
+  - name: "anubis_api_key"
+    type: "string"
+    description: "Adding Anubis API key to get more data"
+
+  - name: "bevigil_api_key"
+    type: "string"
+    description: "Adding BeVigil API key to get more data"
+
+  - name: "bufferover_api_key"
+    type: "string"
+    description: "Adding BufferOver API key to get more data"
+
+  - name: "c99_api_key"
+    type: "string"
+    description: "Adding C99 API key to get more data"
+
+  - name: "censys_api_key"
+    type: "string"
+    description: "Adding Censys API key to get more data"
+
+  - name: "certspotter_api_key"
+    type: "string"
+    description: "Adding CertSpotter API key to get more data"
+
+  - name: "chaos_api_key"
+    type: "string"
+    description: "Adding Chaos API key to get more data"
+
+  - name: "chinaz_api_key"
+    type: "string"
+    description: "Adding Chinaz API key to get more data"
+
+  - name: "commoncrawl_api_key"
+    type: "string"
+    description: "Adding Common Crawl API key to get more data"
+
+  - name: "crtsh_api_key"
+    type: "string"
+    description: "Adding crt.sh API key to get more data"
+
+  - name: "digitorus_api_key"
+    type: "string"
+    description: "Adding Digitorus API key to get more data"
+
+  - name: "dnsdb_api_key"
+    type: "string"
+    description: "Adding DNSDB API key to get more data"
+
+  - name: "dnsdumpster_api_key"
+    type: "string"
+    description: "Adding DNSDumpster API key to get more data"
+
+  - name: "domainsproject_api_key"
+    type: "string"
+    description: "Adding DomainsProject API key to get more data"
+
+  - name: "dnsrepo_api_key"
+    type: "string"
+    description: "Adding DNSRepo API key to get more data"
+
+  - name: "driftnet_api_key"
+    type: "string"
+    description: "Adding Driftnet API key to get more data"
+
+  - name: "fofa_api_key"
+    type: "string"
+    description: "Adding FOFA API key to get more data"
+
+  - name: "fullhunt_api_key"
+    type: "string"
+    description: "Adding FullHunt API key to get more data"
+
+  - name: "github_api_key"
+    type: "string"
+    description: "Adding GitHub API key to get more data"
+
+  - name: "hackertarget_api_key"
+    type: "string"
+    description: "Adding HackerTarget API key to get more data"
+
+  - name: "intelx_api_key"
+    type: "string"
+    description: "Adding IntelX API key to get more data"
+
+  - name: "netlas_api_key"
+    type: "string"
+    description: "Adding Netlas API key to get more data"
+
+  - name: "merklemap_api_key"
+    type: "string"
+    description: "Adding MerkleMap API key to get more data"
+
+  - name: "onyphe_api_key"
+    type: "string"
+    description: "Adding Onyphe API key to get more data"
+
+  - name: "leakix_api_key"
+    type: "string"
+    description: "Adding LeakIX API key to get more data"
+
+  - name: "quake_api_key"
+    type: "string"
+    description: "Adding Quake API key to get more data"
+
+  - name: "pugrecon_api_key"
+    type: "string"
+    description: "Adding PugRecon API key to get more data"
+
+  - name: "rapiddns_api_key"
+    type: "string"
+    description: "Adding RapidDNS API key to get more data"
+
+  - name: "redhuntlabs_api_key"
+    type: "string"
+    description: "Adding RedHuntLabs API key to get more data"
+
+  - name: "robtex_api_key"
+    type: "string"
+    description: "Adding Robtex API key to get more data"
+
+  - name: "rsecloud_api_key"
+    type: "string"
+    description: "Adding RSECloud API key to get more data"
+
+  - name: "securitytrails_api_key"
+    type: "string"
+    description: "Adding SecurityTrails API key to get more data"
+
+  - name: "profundis_api_key"
+    type: "string"
+    description: "Adding Profundis API key to get more data"
+
+  - name: "shodan_api_key"
+    type: "string"
+    description: "Adding Shodan API key to get more data"
+
+  - name: "sitedossier_api_key"
+    type: "string"
+    description: "Adding SiteDossier API key to get more data"
+
+  - name: "threatbook_api_key"
+    type: "string"
+    description: "Adding ThreatBook API key to get more data"
+
+  - name: "threatcrowd_api_key"
+    type: "string"
+    description: "Adding ThreatCrowd API key to get more data"
+
+  - name: "waybackarchive_api_key"
+    type: "string"
+    description: "Adding Wayback Archive API key to get more data"
+
+  - name: "whoisxmlapi_api_key"
+    type: "string"
+    description: "Adding WhoisXML API key to get more data"
+
+  - name: "windvane_api_key"
+    type: "string"
+    description: "Adding WindVane API key to get more data"
+
+  - name: "zoomeye_api_key"
+    type: "string"
+    description: "Adding ZoomEye API key to get more data"
+
+  - name: "facebook_api_key"
+    type: "string"
+    description: "Adding Facebook API key to get more data"
+
+  - name: "reconeer_api_key"
+    type: "string"
+    description: "Adding Reconeer API key to get more data"
+
+  - name: "builtwith_api_key"
+    type: "string"
+    description: "Adding BuiltWith API key to get more data"
+
+  - name: "hudsonrock_api_key"
+    type: "string"
+    description: "Adding HudsonRock API key to get more data"
+
+  - name: "digitalyama_api_key"
+    type: "string"
+    description: "Adding DigitalYama API key to get more data"
+
+  - name: "thc_api_key"
+    type: "string"
+    description: "Adding THC API key to get more data"
