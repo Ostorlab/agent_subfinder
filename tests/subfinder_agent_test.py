@@ -184,7 +184,11 @@ def testAgentSubfinder_whenFindsSubdomains_logsFoundSubdomains(
 
     assert len(agent_mock) == 2
     # Verify logging calls were made for subdomains
-    log_calls = [call for call in logger_info_mock.call_args_list if "Found subdomain" in str(call)]
+    log_calls = [
+        call
+        for call in logger_info_mock.call_args_list
+        if "Found subdomain" in str(call)
+    ]
     assert len(log_calls) == 2
 
 
@@ -208,7 +212,8 @@ def testAgentSubfinder_whenDomainAlreadyProcessed_logsSkipMessage(
 
     # Verify the skip message was logged
     skip_log_calls = [
-        call for call in logger_info_mock.call_args_list 
+        call
+        for call in logger_info_mock.call_args_list
         if "already been processed" in str(call)
     ]
     assert len(skip_log_calls) == 1
