@@ -49,11 +49,11 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
     def update_providers_api_keys(self, args: dict[str, Any]) -> None:
         """Updates providers configuration with API keys from arguments."""
-        providers_arg_names = PROVIDER_ARG_MAP.keys()
+
         logger.info("Starting update of providers configuration with API keys.")
 
         for arg in args:
-            if arg not in providers_arg_names:
+            if arg not in PROVIDER_ARG_MAP:
                 continue
 
             provider_api_key = args.get(arg)
