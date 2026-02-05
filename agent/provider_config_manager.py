@@ -1,50 +1,49 @@
-from agent.config import logger, CONFIG_PATH
+"""Manages provider API keys in the Subfinder YAML configuration file."""
+
+import logging
+import pathlib
 
 import ruamel.yaml
-import pathlib
+
+from agent import config
+
+logger = logging.getLogger(__name__)
+
+CONFIG_PATH = config.CONFIG_PATH
+PROVIDER_ARG_MAP = config.PROVIDER_ARG_MAP
 
 
 class ProviderConfigManager:
-    """
-    Manages API keys for providers in the Subfinder configuration file.
-    """
+    """Manages API keys for providers in the Subfinder YAML configuration file."""
 
     def __init__(self, config_path: str = CONFIG_PATH):
-        self.config_path = config_path
+        self._config_path = config_path
 
     def add_provider_key(self, provider_name: str, api_key: str) -> None:
-        """
-        Add an API key for a specific provider.
-        """
-
-        if not provider_name:
+        """Adds an API key for a specific provider."""
+        if provider_name is None or provider_name.strip() == "":
             logger.error("Provider name cannot be empty.")
             return
-        if not api_key:
+        if api_key is None or api_key.strip() == "":
             logger.error("API key cannot be empty for provider '%s'.", provider_name)
             return
 
-        self.__save_provider_key(provider_name, api_key)
+        self._save_provider_key(provider_name, api_key)
 
-    def __save_provider_key(self, provider_name: str, api_key: str) -> None:
-        """
-        Save an API key for a given provider in the Subfinder configuration file.
-
-        Args:
-            provider_name (str): The provider name (e.g., 'virustotal', 'fofa').
-            api_key (str): The API key to add.
-        """
+    def _save_provider_key(self, provider_name: str, api_key: str) -> None:
+        """Saves an API key for a given provider in the Subfinder config file."""
         yaml = ruamel.yaml.YAML(typ="safe")
-        yaml.default_flow_style = False  # Ensure block-style lists
+        yaml.default_flow_style = False
 
-        config_path = pathlib.Path(self.config_path)
+        config_path = pathlib.Path(self._config_path)
 
-        if not config_path.exists():
+        if config_path.exists() is False:
             logger.error("Configuration file not found at %s.", config_path)
             return
 
         try:
-            config = yaml.load(config_path.read_text()) or {}
+            loaded_config = yaml.load(config_path.read_text())
+            config = loaded_config if loaded_config is not None else {}
         except ruamel.yaml.YAMLError as e:
             logger.error("Failed to parse configuration file: %s", e)
             return

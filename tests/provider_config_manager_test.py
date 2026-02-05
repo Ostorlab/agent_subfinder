@@ -7,7 +7,7 @@ import ruamel.yaml
 from pyfakefs import fake_filesystem_unittest
 from pytest_mock import plugin
 
-from agent.provider_config_manager import ProviderConfigManager
+from agent import provider_config_manager
 
 
 def _load_yaml(path: str) -> dict:
@@ -18,7 +18,7 @@ def _load_yaml(path: str) -> dict:
 def testAddProviderKey_whenProviderNameEmpty_logsErrorAndReturns(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    manager = ProviderConfigManager(config_path="dummy.yaml")
+    manager = provider_config_manager.ProviderConfigManager(config_path="dummy.yaml")
 
     manager.add_provider_key("", "apikey")
 
@@ -28,7 +28,7 @@ def testAddProviderKey_whenProviderNameEmpty_logsErrorAndReturns(
 def testAddProviderKey_whenApiKeyEmpty_logsErrorAndReturns(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    manager = ProviderConfigManager(config_path="dummy.yaml")
+    manager = provider_config_manager.ProviderConfigManager(config_path="dummy.yaml")
 
     manager.add_provider_key("virustotal", "")
 
@@ -38,7 +38,9 @@ def testAddProviderKey_whenApiKeyEmpty_logsErrorAndReturns(
 def testAddProviderKey_whenConfigFileNotFound_logsError(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    manager = ProviderConfigManager(config_path="/fake/path/config.yaml")
+    manager = provider_config_manager.ProviderConfigManager(
+        config_path="/fake/path/config.yaml"
+    )
 
     manager.add_provider_key("virustotal", "new_key")
 
@@ -52,7 +54,7 @@ def testAddProviderKey_whenFileEmpty_createsProviderSection() -> None:
         assert patcher.fs is not None
         patcher.fs.create_file(fake_path, contents="")
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "new_key")
 
         config = _load_yaml(fake_path)
@@ -70,7 +72,7 @@ shodan:
         assert patcher.fs is not None
         patcher.fs.create_file(fake_path, contents=contents)
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "new_key")
 
         config = _load_yaml(fake_path)
@@ -89,7 +91,7 @@ virustotal:
         assert patcher.fs is not None
         patcher.fs.create_file(fake_path, contents=contents)
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "new_key")
 
         config = _load_yaml(fake_path)
@@ -107,7 +109,7 @@ virustotal:
         assert patcher.fs is not None
         patcher.fs.create_file(fake_path, contents=contents)
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "existing_key")
 
         config = _load_yaml(fake_path)
@@ -124,7 +126,7 @@ def testAddProviderKey_whenYamlInvalid_logsParseError(
         assert patcher.fs is not None
         patcher.fs.create_file(fake_path, contents=invalid_yaml)
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "new_key")
 
         assert "Failed to parse configuration file" in caplog.text
@@ -145,7 +147,7 @@ def testAddProviderKey_whenWriteFails_logsError(
             side_effect=IOError("disk full"),
         )
 
-        manager = ProviderConfigManager(config_path=fake_path)
+        manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
         manager.add_provider_key("virustotal", "new_key")
 
         assert "Failed to write configuration file" in caplog.text

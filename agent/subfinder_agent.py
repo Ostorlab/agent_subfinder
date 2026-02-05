@@ -1,19 +1,34 @@
 """Agent implementation for Subfinder : subdomain discovery tool that discovers valid subdomains for websites."""
 
+import logging
+from typing import Any
+
 import tld
 from ostorlab.agent import agent
+from ostorlab.agent import definitions as agent_definitions
 from ostorlab.agent.message import message as m
 from ostorlab.agent.mixins import agent_persist_mixin
-from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
+from rich import logging as rich_logging
 
+from agent import config
+from agent import provider_config_manager
 from agent import subfinder
 
-from agent.config import logger, STORAGE_NAME, PROVIDER_ARG_MAP
-from agent.provider_config_manager import ProviderConfigManager
+logging.basicConfig(
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[rich_logging.RichHandler(rich_tracebacks=True)],
+    level="INFO",
+    force=True,
+)
 
+logger = logging.getLogger(__name__)
 
-provider_config_manager = ProviderConfigManager()
+PROVIDER_ARG_MAP = config.PROVIDER_ARG_MAP
+STORAGE_NAME = config.STORAGE_NAME
+
+provider_config_mgr = provider_config_manager.ProviderConfigManager()
 
 
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
@@ -26,17 +41,14 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
     ) -> None:
         agent.Agent.__init__(self, agent_definition, agent_settings)
 
-        # Update providers configuration with API keys
         self.update_providers_api_keys(self.args)
 
         self._use_all_sources: bool = self.args.get("use_all_sources") or False
         self._active_only: bool = self.args.get("active_only") or False
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
-    def update_providers_api_keys(self, args: dict[str, str]) -> None:
-
-        # Update providers configuration with API keys from the provided arguments.
-
+    def update_providers_api_keys(self, args: dict[str, Any]) -> None:
+        """Updates providers configuration with API keys from arguments."""
         providers_arg_names = PROVIDER_ARG_MAP.keys()
         logger.info("Starting update of providers configuration with API keys.")
 
@@ -45,7 +57,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                 continue
 
             provider_api_key = args.get(arg)
-            if not provider_api_key:
+            if provider_api_key is None or provider_api_key.strip() == "":
                 logger.debug(
                     "No API key provided for provider argument '%s'; skipping.",
                     arg,
@@ -53,7 +65,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
                 continue
 
             provider_name = PROVIDER_ARG_MAP.get(arg)
-            if not provider_name:
+            if provider_name is None or provider_name.strip() == "":
                 logger.warning(
                     "No provider mapping found for argument '%s'; skipping.",
                     arg,
@@ -62,7 +74,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
             logger.info("Adding API key for provider '%s'.", provider_name)
 
-            provider_config_manager.add_provider_key(
+            provider_config_mgr.add_provider_key(
                 provider_name,
                 provider_api_key,
             )

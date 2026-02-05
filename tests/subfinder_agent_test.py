@@ -105,8 +105,8 @@ def testUpdateProvidersApiKeys_whenValidApiKeyProvided_addsKeyToProviderConfig(
     mocker: plugin.MockerFixture,
 ) -> None:
     """Unit test for update_providers_api_keys: when a valid API key is provided, it should be added to the provider config."""
-    add_provider_key_mock = mocker.patch(
-        "agent.subfinder_agent.provider_config_manager.add_provider_key"
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
     )
     args = {"virustotal_api_key": "test_api_key_123"}
 
@@ -120,10 +120,10 @@ def testUpdateProvidersApiKeys_whenNoApiKeyProvided_skipsProvider(
     mocker: plugin.MockerFixture,
 ) -> None:
     """Unit test for update_providers_api_keys: when no API key is provided for a provider argument, it should be skipped."""
-    add_provider_key_mock = mocker.patch(
-        "agent.subfinder_agent.provider_config_manager.add_provider_key"
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
     )
-    args = {"virustotal_api_key": None, "shodan_api_key": ""}
+    args: dict[str, str | None] = {"virustotal_api_key": None, "shodan_api_key": ""}
 
     subfinder_agent.update_providers_api_keys(args)
 
@@ -135,8 +135,8 @@ def testUpdateProvidersApiKeys_whenArgNotInProviderMap_skipsArg(
     mocker: plugin.MockerFixture,
 ) -> None:
     """Unit test for update_providers_api_keys: when an argument is not in PROVIDER_ARG_MAP, it should be skipped."""
-    add_provider_key_mock = mocker.patch(
-        "agent.subfinder_agent.provider_config_manager.add_provider_key"
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
     )
     args = {"unknown_provider_api_key": "some_key", "random_arg": "value"}
 
@@ -150,8 +150,8 @@ def testUpdateProvidersApiKeys_whenMultipleValidApiKeysProvided_addsAllKeysToPro
     mocker: plugin.MockerFixture,
 ) -> None:
     """Unit test for update_providers_api_keys: when multiple valid API keys are provided, all should be added."""
-    add_provider_key_mock = mocker.patch(
-        "agent.subfinder_agent.provider_config_manager.add_provider_key"
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
     )
     args = {
         "virustotal_api_key": "vt_key_123",
@@ -178,12 +178,12 @@ def testAgentSubfinder_whenFindsSubdomains_logsFoundSubdomains(
     del agent_persist_mock
     subfinder_output = ["subdomain1.co", "subdomain2.co"]
     mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
-    logger_info_mock = mocker.patch("agent.config.logger.info")
+    logger_info_mock = mocker.patch("agent.subfinder_agent.logger.info")
 
     subfinder_agent.process(domain_message)
 
     assert len(agent_mock) == 2
-    # Verify logging calls were made for subdomains
+
     log_calls = [
         call
         for call in logger_info_mock.call_args_list
@@ -203,17 +203,50 @@ def testAgentSubfinder_whenDomainAlreadyProcessed_logsSkipMessage(
     del agent_persist_mock
     subfinder_output = ["subdomain1.co", "subdomain2.co", "subdomain3.co"]
     mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
-    logger_info_mock = mocker.patch("agent.config.logger.info")
+    logger_info_mock = mocker.patch("agent.subfinder_agent.logger.info")
 
-    # First call processes the domain
-    subfinder_agent.process(domain_message)
-    # Second call should skip it
     subfinder_agent.process(domain_message)
 
-    # Verify the skip message was logged
+    subfinder_agent.process(domain_message)
+
     skip_log_calls = [
         call
         for call in logger_info_mock.call_args_list
         if "already been processed" in str(call)
     ]
     assert len(skip_log_calls) == 1
+
+
+def testUpdateProvidersApiKeys_whenApiKeyIsWhitespaceOnly_skipsProvider(
+    subfinder_agent: sub_agent.SubfinderAgent,
+    mocker: plugin.MockerFixture,
+) -> None:
+    """Unit test for update_providers_api_keys: when API key is whitespace only, it should be skipped."""
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
+    )
+    args = {"virustotal_api_key": "   ", "shodan_api_key": "\t\n"}
+
+    subfinder_agent.update_providers_api_keys(args)
+
+    add_provider_key_mock.assert_not_called()
+
+
+def testUpdateProvidersApiKeys_whenProviderMappingIsEmptyOrNone_skipsProvider(
+    subfinder_agent: sub_agent.SubfinderAgent,
+    mocker: plugin.MockerFixture,
+) -> None:
+    """Unit test for update_providers_api_keys: when provider mapping value is empty or None, it should be skipped."""
+    add_provider_key_mock = mocker.patch.object(
+        sub_agent.provider_config_mgr, "add_provider_key"
+    )
+
+    mocker.patch.dict(
+        sub_agent.PROVIDER_ARG_MAP,
+        {"test_empty_provider": "", "test_none_provider": None},
+    )
+    args = {"test_empty_provider": "valid_key", "test_none_provider": "another_key"}
+
+    subfinder_agent.update_providers_api_keys(args)
+
+    add_provider_key_mock.assert_not_called()
