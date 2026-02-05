@@ -77,10 +77,6 @@ args:
     type: "string"
     description: "Adding AlienVault API key to get more data"
 
-  - name: "anubis_api_key"
-    type: "string"
-    description: "Adding Anubis API key to get more data"
-
   - name: "bevigil_api_key"
     type: "string"
     description: "Adding BeVigil API key to get more data"
@@ -108,18 +104,6 @@ args:
   - name: "chinaz_api_key"
     type: "string"
     description: "Adding Chinaz API key to get more data"
-
-  - name: "commoncrawl_api_key"
-    type: "string"
-    description: "Adding Common Crawl API key to get more data"
-
-  - name: "crtsh_api_key"
-    type: "string"
-    description: "Adding crt.sh API key to get more data"
-
-  - name: "digitorus_api_key"
-    type: "string"
-    description: "Adding Digitorus API key to get more data"
 
   - name: "dnsdb_api_key"
     type: "string"
@@ -185,10 +169,6 @@ args:
     type: "string"
     description: "Adding PugRecon API key to get more data"
 
-  - name: "rapiddns_api_key"
-    type: "string"
-    description: "Adding RapidDNS API key to get more data"
-
   - name: "redhuntlabs_api_key"
     type: "string"
     description: "Adding RedHuntLabs API key to get more data"
@@ -213,10 +193,6 @@ args:
     type: "string"
     description: "Adding Shodan API key to get more data"
 
-  - name: "sitedossier_api_key"
-    type: "string"
-    description: "Adding SiteDossier API key to get more data"
-
   - name: "threatbook_api_key"
     type: "string"
     description: "Adding ThreatBook API key to get more data"
@@ -224,10 +200,6 @@ args:
   - name: "threatcrowd_api_key"
     type: "string"
     description: "Adding ThreatCrowd API key to get more data"
-
-  - name: "waybackarchive_api_key"
-    type: "string"
-    description: "Adding Wayback Archive API key to get more data"
 
   - name: "whoisxmlapi_api_key"
     type: "string"
@@ -253,14 +225,6 @@ args:
     type: "string"
     description: "Adding BuiltWith API key to get more data"
 
-  - name: "hudsonrock_api_key"
-    type: "string"
-    description: "Adding HudsonRock API key to get more data"
-
   - name: "digitalyama_api_key"
     type: "string"
     description: "Adding DigitalYama API key to get more data"
-
-  - name: "thc_api_key"
-    type: "string"
-    description: "Adding THC API key to get more data"
