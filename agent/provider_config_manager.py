@@ -5,26 +5,23 @@ import pathlib
 
 import ruamel.yaml
 
-from agent import config
+from agent import config as agent_config
 
 logger = logging.getLogger(__name__)
-
-CONFIG_PATH = config.CONFIG_PATH
-PROVIDER_ARG_MAP = config.PROVIDER_ARG_MAP
 
 
 class ProviderConfigManager:
     """Manages API keys for providers in the Subfinder YAML configuration file."""
 
-    def __init__(self, config_path: str = CONFIG_PATH):
+    def __init__(self, config_path: str = agent_config.CONFIG_PATH) -> None:
         self._config_path = config_path
 
     def add_provider_key(self, provider_name: str, api_key: str) -> None:
         """Adds an API key for a specific provider."""
-        if provider_name is None or provider_name.strip() == "":
+        if provider_name.strip() == "":
             logger.error("Provider name cannot be empty.")
             return
-        if api_key is None or api_key.strip() == "":
+        if api_key.strip() == "":
             logger.error("API key cannot be empty for provider '%s'.", provider_name)
             return
 
@@ -48,17 +45,16 @@ class ProviderConfigManager:
             logger.error("Failed to parse configuration file: %s", e)
             return
 
-        if provider_name in config:
-            if api_key not in config[provider_name]:
-                config[provider_name].append(api_key)
-                logger.info("Added API key for provider '%s'.", provider_name)
-            else:
-                logger.info(
-                    "API key for provider '%s' already exists; skipping.", provider_name
-                )
-        else:
-            config[provider_name] = [api_key]
+        if provider_name not in config:
+            config[provider_name] = []
             logger.info("Created new provider entry '%s' with API key.", provider_name)
+        if api_key not in config[provider_name]:
+            config[provider_name].append(api_key)
+            logger.info("Added API key for provider '%s'.", provider_name)
+        else:
+            logger.info(
+                "API key for provider '%s' already exists; skipping.", provider_name
+            )
 
         try:
             with config_path.open("w") as file:

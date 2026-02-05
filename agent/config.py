@@ -1,10 +1,10 @@
 """Configuration module for the Subfinder agent."""
 
-STORAGE_NAME = "agent_subfinder_storage"
+STORAGE_NAME: str = "agent_subfinder_storage"
 
-CONFIG_PATH = "/root/.config/subfinder/provider-config.yaml"
+CONFIG_PATH: str = "/root/.config/subfinder/provider-config.yaml"
 
-PROVIDER_ARG_MAP = {
+PROVIDER_ARG_MAP: dict[str, str] = {
     "virustotal_api_key": "virustotal",
     "alienvault_api_key": "alienvault",
     "anubis_api_key": "anubis",

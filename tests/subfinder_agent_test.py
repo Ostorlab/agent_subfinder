@@ -111,7 +111,7 @@ def testUpdateProvidersApiKeys_whenValidApiKeyProvided_addsKeyToProviderConfig(
     add_provider_key_mock = mocker.patch.object(
         sub_agent.provider_config_mgr, "add_provider_key"
     )
-    args = {"virustotal_api_key": "test_api_key_123"}
+    args: dict[str, str | None] = {"virustotal_api_key": "test_api_key_123"}
 
     subfinder_agent.update_providers_api_keys(args)
 
@@ -141,7 +141,10 @@ def testUpdateProvidersApiKeys_whenArgNotInProviderMap_skipsArg(
     add_provider_key_mock = mocker.patch.object(
         sub_agent.provider_config_mgr, "add_provider_key"
     )
-    args = {"unknown_provider_api_key": "some_key", "random_arg": "value"}
+    args: dict[str, str | None] = {
+        "unknown_provider_api_key": "some_key",
+        "random_arg": "value",
+    }
 
     subfinder_agent.update_providers_api_keys(args)
 
@@ -156,7 +159,7 @@ def testUpdateProvidersApiKeys_whenMultipleValidApiKeysProvided_addsAllKeysToPro
     add_provider_key_mock = mocker.patch.object(
         sub_agent.provider_config_mgr, "add_provider_key"
     )
-    args = {
+    args: dict[str, str | None] = {
         "virustotal_api_key": "vt_key_123",
         "shodan_api_key": "shodan_key_456",
         "github_api_key": "github_key_789",
@@ -228,27 +231,10 @@ def testUpdateProvidersApiKeys_whenApiKeyIsWhitespaceOnly_skipsProvider(
     add_provider_key_mock = mocker.patch.object(
         sub_agent.provider_config_mgr, "add_provider_key"
     )
-    args = {"virustotal_api_key": "   ", "shodan_api_key": "\t\n"}
-
-    subfinder_agent.update_providers_api_keys(args)
-
-    add_provider_key_mock.assert_not_called()
-
-
-def testUpdateProvidersApiKeys_whenProviderMappingIsEmptyOrNone_skipsProvider(
-    subfinder_agent: sub_agent.SubfinderAgent,
-    mocker: plugin.MockerFixture,
-) -> None:
-    """Unit test for update_providers_api_keys: when provider mapping value is empty or None, it should be skipped."""
-    add_provider_key_mock = mocker.patch.object(
-        sub_agent.provider_config_mgr, "add_provider_key"
-    )
-
-    mocker.patch.dict(
-        sub_agent.PROVIDER_ARG_MAP,
-        {"test_empty_provider": "", "test_none_provider": None},
-    )
-    args = {"test_empty_provider": "valid_key", "test_none_provider": "another_key"}
+    args: dict[str, str | None] = {
+        "virustotal_api_key": "   ",
+        "shodan_api_key": "\t\n",
+    }
 
     subfinder_agent.update_providers_api_keys(args)
 
