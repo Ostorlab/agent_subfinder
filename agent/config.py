@@ -1,0 +1,47 @@
+"""Configuration module for the Subfinder agent."""
+
+STORAGE_NAME: str = "agent_subfinder_storage"
+
+CONFIG_PATH: str = "/root/.config/subfinder/provider-config.yaml"
+
+PROVIDER_ARG_MAP: dict[str, str] = {
+    "virustotal_api_key": "virustotal",
+    "alienvault_api_key": "alienvault",
+    "bevigil_api_key": "bevigil",
+    "bufferover_api_key": "bufferover",
+    "c99_api_key": "c99",
+    "censys_api_key": "censys",
+    "certspotter_api_key": "certspotter",
+    "chaos_api_key": "chaos",
+    "chinaz_api_key": "chinaz",
+    "dnsdb_api_key": "dnsdb",
+    "dnsdumpster_api_key": "dnsdumpster",
+    "domainsproject_api_key": "domainsproject",
+    "dnsrepo_api_key": "dnsrepo",
+    "driftnet_api_key": "driftnet",
+    "fofa_api_key": "fofa",
+    "fullhunt_api_key": "fullhunt",
+    "github_api_key": "github",
+    "hackertarget_api_key": "hackertarget",
+    "intelx_api_key": "intelx",
+    "netlas_api_key": "netlas",
+    "merklemap_api_key": "merklemap",
+    "onyphe_api_key": "onyphe",
+    "leakix_api_key": "leakix",
+    "quake_api_key": "quake",
+    "pugrecon_api_key": "pugrecon",
+    "redhuntlabs_api_key": "redhuntlabs",
+    "robtex_api_key": "robtex",
+    "rsecloud_api_key": "rsecloud",
+    "securitytrails_api_key": "securitytrails",
+    "profundis_api_key": "profundis",
+    "shodan_api_key": "shodan",
+    "threatbook_api_key": "threatbook",
+    "whoisxmlapi_api_key": "whoisxmlapi",
+    "windvane_api_key": "windvane",
+    "zoomeye_api_key": "zoomeyeapi",
+    "facebook_api_key": "facebook",
+    "reconeer_api_key": "reconeer",
+    "builtwith_api_key": "builtwith",
+    "digitalyama_api_key": "digitalyama",
+}
