@@ -1,4 +1,4 @@
-FROM python:3.11-slim as base
+FROM python:3.14-slim as base
 FROM base as builder
 RUN apt-get update && apt-get install -y gcc g++ python3-dev && rm -rf /var/lib/apt/lists/*
 RUN mkdir /install
@@ -24,4 +24,4 @@ WORKDIR /root/.config/subfinder/
 RUN touch provider-config.yaml
 
 WORKDIR /app
-CMD ["python3.11", "/app/agent/subfinder_agent.py"]
+CMD ["python", "/app/agent/subfinder_agent.py"]
