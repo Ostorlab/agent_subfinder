@@ -7,7 +7,7 @@ COPY requirement.txt /requirement.txt
 RUN pip install --upgrade pip && pip install --prefix=/install -r /requirement.txt
 
 FROM golang:1.24-alpine AS go-build-env
-RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@v2.12.0
+RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@v2.14.0
 
 FROM base
 RUN apt-get update && apt-get install -y bind9 dnsutils ca-certificates
