@@ -11,8 +11,7 @@ from ostorlab.runtimes import definitions as runtime_definitions
 from rich import logging as rich_logging
 
 from agent import config as agent_config
-from agent import provider_config_manager
-from agent import subfinder
+from agent import provider_config_manager, subfinder
 
 logging.basicConfig(
     format="%(message)s",
