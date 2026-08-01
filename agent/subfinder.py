@@ -1,11 +1,9 @@
 """Wrapper module around the Subfinder subdomaine discovery tool."""
 
 import io
-import tempfile
-import subprocess
 import logging
-from typing import List
-
+import subprocess
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -39,13 +37,13 @@ class SubFinder:
 
         subprocess.run(args=command, check=True)
 
-    def _parse_output(self, output_file: io.TextIOWrapper) -> List[str]:
+    def _parse_output(self, output_file: io.TextIOWrapper) -> list[str]:
         """Reads the output of the subfinder tool, & returns a list of subdomains."""
         with open(output_file.name, "r", encoding="utf-8") as f:
             sub_domains = f.read().splitlines()
         return sub_domains
 
-    def discover(self, domain: str) -> List[str]:
+    def discover(self, domain: str) -> list[str]:
         """find subdomains for a domain with subfinder tool.
 
         Args:

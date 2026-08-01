@@ -1,8 +1,8 @@
 """Unittests for the Subfinder Agent."""
 
+from ostorlab.agent.message import message
 from pytest_mock import plugin
 
-from ostorlab.agent.message import message
 from agent import subfinder_agent as sub_agent
 
 

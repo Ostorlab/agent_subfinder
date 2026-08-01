@@ -59,5 +59,5 @@ class ProviderConfigManager:
         try:
             with config_path.open("w") as file:
                 yaml.dump(config, file)
-        except (IOError, OSError) as write_error:
+        except OSError as write_error:
             logger.error("Failed to write configuration file: %s", write_error)

@@ -1,15 +1,14 @@
 """Pytest fixtures for the Subfinder agent"""
 
-import random
 import json
+import pathlib
+import random
 
 import pytest
-import pathlib
-
 from ostorlab.agent import definitions as agent_definitions
+from ostorlab.agent.message import message
 from ostorlab.runtimes import definitions as runtime_definitions
 from ostorlab.utils import definitions as utils_definitions
-from ostorlab.agent.message import message
 
 from agent import subfinder_agent
 

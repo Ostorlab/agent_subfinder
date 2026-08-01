@@ -144,7 +144,7 @@ def testAddProviderKey_whenWriteFails_logsError(
 
         mocker.patch(
             "ruamel.yaml.main.YAML.dump",
-            side_effect=IOError("disk full"),
+            side_effect=OSError("disk full"),
         )
 
         manager = provider_config_manager.ProviderConfigManager(config_path=fake_path)
