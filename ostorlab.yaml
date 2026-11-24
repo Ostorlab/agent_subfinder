@@ -51,6 +51,7 @@ in_selectors:
   - v3.asset.domain_name
 out_selectors:
   - v3.asset.domain_name
+  - v3.fingerprint.domain_name.subdomains
 supported_architectures:
   - linux/arm64/v8
   - linux/x86_64
@@ -67,6 +68,12 @@ args:
   - name: active_only
     type: "boolean"
     description: "Display active subdomains only"
+    value: false
+  - name: "appcards_scan"
+    type: "boolean"
+    description: "Whether the scan collects AppCards data. The received name itself, like
+     api.example.com, is then looked up, and the names under it are emitted in one
+     v3.fingerprint.domain_name.subdomains message instead of one v3.asset.domain_name message each."
     value: false
 
   - name: "virustotal_api_key"

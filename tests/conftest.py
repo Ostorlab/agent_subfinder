@@ -105,7 +105,61 @@ def active_enumeration_subfinder() -> subfinder_agent.SubfinderAgent:
 
 
 @pytest.fixture
+def appcards_subfinder_agent() -> subfinder_agent.SubfinderAgent:
+    """Subfinder agent of an AppCards scan."""
+    with (pathlib.Path(__file__).parent.parent / "ostorlab.yaml").open() as yaml_o:
+        definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
+        settings = runtime_definitions.AgentSettings(
+            key="agent/ostorlab/subfinder",
+            bus_url="NA",
+            bus_exchange_topic="NA",
+            args=[
+                utils_definitions.Arg(
+                    name="appcards_scan",
+                    type="boolean",
+                    value=json.dumps(True).encode(),
+                ),
+            ],
+            healthcheck_port=random.randint(5000, 6000),
+            redis_url="redis://guest:guest@localhost:6379",
+        )
+        return subfinder_agent.SubfinderAgent(definition, settings)
+
+
+@pytest.fixture
+def appcards_subfinder_agent_max_subdomains() -> subfinder_agent.SubfinderAgent:
+    """Subfinder agent of an AppCards scan that keeps at most 2 subdomains."""
+    with (pathlib.Path(__file__).parent.parent / "ostorlab.yaml").open() as yaml_o:
+        definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
+        settings = runtime_definitions.AgentSettings(
+            key="agent/ostorlab/subfinder",
+            bus_url="NA",
+            bus_exchange_topic="NA",
+            args=[
+                utils_definitions.Arg(
+                    name="appcards_scan",
+                    type="boolean",
+                    value=json.dumps(True).encode(),
+                ),
+                utils_definitions.Arg(
+                    name="max_subdomains", type="int", value=json.dumps(2).encode()
+                ),
+            ],
+            healthcheck_port=random.randint(5000, 6000),
+            redis_url="redis://guest:guest@localhost:6379",
+        )
+        return subfinder_agent.SubfinderAgent(definition, settings)
+
+
+@pytest.fixture
 def domain_message() -> message.Message:
     return message.Message.from_data(
         selector="v3.asset.domain_name", data={"name": "somedomain.com"}
+    )
+
+
+@pytest.fixture
+def www_domain_message() -> message.Message:
+    return message.Message.from_data(
+        selector="v3.asset.domain_name", data={"name": "www.somedomain.com"}
     )

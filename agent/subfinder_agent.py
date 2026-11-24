@@ -26,6 +26,12 @@ logger = logging.getLogger(__name__)
 provider_config_mgr = provider_config_manager.ProviderConfigManager()
 
 
+def _subdomains_of(domain: str, names: list[str]) -> list[str]:
+    """The names under `domain`, lower-cased, each once and sorted."""
+    lowered = {name.strip().lower() for name in names}
+    return sorted(name for name in lowered if name.endswith(f".{domain}"))
+
+
 class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
     """Subfinder agent implementation."""
 
@@ -40,6 +46,7 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
         self._use_all_sources: bool = self.args.get("use_all_sources") or False
         self._active_only: bool = self.args.get("active_only") or False
+        self._appcards_scan: bool = self.args.get("appcards_scan") is True
         agent_persist_mixin.AgentPersistMixin.__init__(self, agent_settings)
 
     def update_providers_api_keys(self, args: dict[str, str | None]) -> None:
@@ -86,6 +93,12 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
         if canonalized_domain is None:
             return
 
+        if self._appcards_scan is True:
+            host = canonalized_domain.parsed_url.hostname
+            if host is not None:
+                self._emit_subdomains(host)
+            return
+
         canonalized_domain = canonalized_domain.fld
 
         if self.set_add(agent_config.STORAGE_NAME, canonalized_domain) is True:
@@ -103,6 +116,24 @@ class SubfinderAgent(agent.Agent, agent_persist_mixin.AgentPersistMixin):
 
         else:
             logger.info("%s has already been processed. skipping for now.", domain_name)
+
+    def _emit_subdomains(self, domain: str) -> None:
+        """Emit the subdomains of the scanned domain name in one message, once per name."""
+        if self.set_add(agent_config.STORAGE_NAME, domain) is False:
+            logger.info("%s has already been processed. skipping for now.", domain)
+            return
+        with subfinder.SubFinder(
+            use_all_sources=self._use_all_sources, active_only=self._active_only
+        ) as subfinder_handler:
+            subdomains = _subdomains_of(domain, subfinder_handler.discover(domain))
+        max_subdomains = self.args.get("max_subdomains")
+        if max_subdomains is not None:
+            subdomains = subdomains[:max_subdomains]
+        logger.info("Found %d subdomains of %s.", len(subdomains), domain)
+        self.emit(
+            selector="v3.fingerprint.domain_name.subdomains",
+            data={"name": domain, "subdomains": subdomains},
+        )
 
 
 if __name__ == "__main__":

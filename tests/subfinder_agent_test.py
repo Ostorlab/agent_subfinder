@@ -239,3 +239,143 @@ def testUpdateProvidersApiKeys_whenApiKeyIsWhitespaceOnly_skipsProvider(
     subfinder_agent.update_providers_api_keys(args)
 
     add_provider_key_mock.assert_not_called()
+
+
+def testAgentSubfinder_whenAppcardsScan_emitsOneSubdomainsMessageOfTheScannedName(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    www_domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    subfinder_output = [
+        "www.somedomain.com",
+        "API.www.somedomain.com",
+        "api.www.somedomain.com",
+        "blog.www.somedomain.com ",
+        "blog.somedomain.com",
+    ]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+
+    appcards_subfinder_agent.process(www_domain_message)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].selector == "v3.fingerprint.domain_name.subdomains"
+    assert agent_mock[0].data["name"] == "www.somedomain.com"
+    assert agent_mock[0].data["subdomains"] == [
+        "api.www.somedomain.com",
+        "blog.www.somedomain.com",
+    ]
+
+
+def testAgentSubfinder_whenAppcardsScan_looksUpTheScannedName(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    www_domain_message: message.Message,
+) -> None:
+    del agent_persist_mock, agent_mock
+    run_command_mock = mocker.patch("subprocess.run", return_value=None)
+
+    appcards_subfinder_agent.process(www_domain_message)
+
+    subfinder_args = run_command_mock.call_args_list[0].kwargs["args"]
+    assert subfinder_args[subfinder_args.index("-d") + 1] == "www.somedomain.com"
+
+
+def testAgentSubfinder_whenAppcardsScanFindsNamesOutsideTheDomain_dropsThem(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    subfinder_output = [
+        "somedomain.com",
+        "othersomedomain.com",
+        "a.other.com",
+        "a.somedomain.com",
+    ]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+
+    appcards_subfinder_agent.process(domain_message)
+
+    assert agent_mock[0].data["subdomains"] == ["a.somedomain.com"]
+
+
+def testAgentSubfinder_whenAppcardsScanAndMaxSubdomainsSet_capsTheSortedList(
+    appcards_subfinder_agent_max_subdomains: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    subfinder_output = ["c.somedomain.com", "b.somedomain.com", "a.somedomain.com"]
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=subfinder_output)
+
+    appcards_subfinder_agent_max_subdomains.process(domain_message)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].data["subdomains"] == ["a.somedomain.com", "b.somedomain.com"]
+
+
+def testAgentSubfinder_whenAppcardsScanFindsNothing_emitsTheDomainWithNoSubdomain(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    mocker.patch("agent.subfinder.SubFinder.discover", return_value=[])
+
+    appcards_subfinder_agent.process(domain_message)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].data == {"name": "somedomain.com"}
+
+
+def testAgentSubfinder_whenAppcardsScanReceivesTheSameNameAgain_skipsIt(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    www_domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    discover_mock = mocker.patch(
+        "agent.subfinder.SubFinder.discover", return_value=["a.www.somedomain.com"]
+    )
+
+    appcards_subfinder_agent.process(www_domain_message)
+    appcards_subfinder_agent.process(www_domain_message)
+
+    assert discover_mock.call_count == 1
+    assert len(agent_mock) == 1
+
+
+def testAgentSubfinder_whenAppcardsScanReceivesASubdomainAndItsDomain_looksUpEach(
+    appcards_subfinder_agent: sub_agent.SubfinderAgent,
+    agent_mock: list[message.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+    mocker: plugin.MockerFixture,
+    domain_message: message.Message,
+    www_domain_message: message.Message,
+) -> None:
+    del agent_persist_mock
+    mocker.patch(
+        "agent.subfinder.SubFinder.discover",
+        return_value=["a.somedomain.com", "a.www.somedomain.com"],
+    )
+
+    appcards_subfinder_agent.process(www_domain_message)
+    appcards_subfinder_agent.process(domain_message)
+
+    assert [(m.data["name"], m.data["subdomains"]) for m in agent_mock] == [
+        ("www.somedomain.com", ["a.www.somedomain.com"]),
+        ("somedomain.com", ["a.somedomain.com", "a.www.somedomain.com"]),
+    ]
